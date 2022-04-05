@@ -101,10 +101,12 @@ module Saving
     the ones from the "RAW_DATA/INITIAL_CONDITIONS/" directory
     =#
 
-    function saving_powers_of_2(vecsize::Int64=100, blocksize::Int64=4, maxrand::Int64=10; type::String)
+
+
+    function saving_powers_of_2(vecsize::Int64=100, maxrand::Int64=10, blocksize::Int64=4; type::String)
         # from definition:
         # initialcondition(vecsize::Int=100,maxrand::Int=10, blocksize::Int=4; type::String)
-        n0s = InitialConditions.initialcondition(vecsize, maxrand,blocksize; type)
+        n0s = InitialConditions.initialcondition(vecsize, maxrand, blocksize; type)
 
         # this if condition exists to assure that the number of created initial conditions
         # is the same as expected by the factorial of blocksize
@@ -125,13 +127,13 @@ module Saving
             end
         else
             println("Number of initial conditions does not match with expected")
-            println(n0s)
+            #println(n0s)
             println(length(n0s[:,1]))
             println(factorial(blocksize))
         end
     end
 
-    function saving_base10(vecsize::Int64=100, blocksize::Int64=4, maxrand::Int64=10; type::String)
+    function saving_base10(vecsize::Int64=100, maxrand::Int64=10, blocksize::Int64=4; type::String)
         if type == "Prime"
             for i in 1:factorial(blocksize)
                 fname_power_of_2 = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_power_of_2.csv"
