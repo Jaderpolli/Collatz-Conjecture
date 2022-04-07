@@ -9,12 +9,12 @@ using CSV
 using DataFrames
 
 # These are the variables that define what type of initial condition is being used
-type = "Random"
+type = "Prime"
 var = readdlm("RAW_DATA/INITIAL_CONDITIONS/variables_n_0_$(type).dat", header = false)
 var = Array(var)
-vecsize = var[1] #size of the m-vector
-maxrand = var[2] #when type = "Random" this is the maximum value possible
-blocksize = var[3] # when type = "Prime" this is the number of the first primes taken
+mVectorSize = var[1] #size of the m-vector
+MaxRand = var[2] #when type = "Random" this is the maximum value possible
+primeBlockSize = var[3] # when type = "Prime" this is the number of the first primes taken
 
 # this module has the CollatzMap function. It is used the accelerated collatz function
 module CollatzMap
@@ -27,46 +27,38 @@ end
 # this module contains the function that generates the orbit in base 10
 module OrbitsBase10
     import Main.CollatzMap
-    import Main.blocksize, Main.type, Main.vecsize, Main.maxrand
+    import Main.primeBlockSize, Main.type, Main.mVectorSize, Main.MaxRand
     using CSV
     using DelimitedFiles
     using DataFrames
 
     function orbitbase10(i::Int64; type::String)
-        if type == "Prime"
-            n0 = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_base10.csv",BigInt, header = false)
-        elseif type == "Random"
-            n0 = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_vecsize_$(vecsize)_maxrand_$(maxrand)_base10.csv",BigInt, header = false)
+        n₀ = readdlm( "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",BigInt, header = false)
+        iterateVariable = BigInt(n₀[1,1])
+        orbit = BigInt[iterateVariable]
+        while iterateVariable > 1
+            iterateVariable = CollatzMap.collatz(iterateVariable)
+            push!(orbit, iterateVariable)
         end
-        num = BigInt(n0[1,1])
-        orb = BigInt[num]
-        while num > 1
-            num = CollatzMap.collatz(num)
-            push!(orb, num)
-        end
-        return(orb)
+        return(orbit)
     end
 end
 
 # this module saves the orbit in base 10 into a .csv file
-module SavingBase10
+module SavingOrbitsBase10
 
     import Main.CollatzMap
     import Main.OrbitsBase10
-    import Main.blocksize, Main.type, Main.vecsize, Main.maxrand
+    import Main.primeBlockSize, Main.type, Main.mVectorSize, Main.MaxRand
     using CSV
     using DataFrames
     using DelimitedFiles
 
-    function savingbase10()
-        for i in 1:factorial(blocksize)
-            println(i/factorial(blocksize)*100) #time counter
-            orb = OrbitsBase10.orbitbase10(i; type)
-            if type == "Prime"
-                writedlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_base10.csv",orb)
-            elseif type == "Random"
-                writedlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_maxrand_$(maxrand)_base10.csv",orb)
-            end
+    function savingorbitbase10()
+        for i in 1:factorial(primeBlockSize)
+            println(i/factorial(primeBlockSize)*100) #time counter
+            orbit= OrbitsBase10.orbitbase10(i; type)
+            writedlm("RAW_DATA/ORBITS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit)
         end
     end
 end
@@ -76,20 +68,16 @@ end
 module OrbitPowersOf2
 
     include("initial_condition_modules.jl")
-    import Main.Algorithms, Main.vecsize, Main.maxrand, Main.blocksize, Main.type
+    import Main.AlgorithmsOfmVectors, Main.mVectorSize, Main.MaxRand, Main.primeBlockSize, Main.type
     using DelimitedFiles
 
     function orbitpowerof2(i::Int64; type::String)
-        if type == "Prime"
-            orb = readdlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_base10.csv",BigInt, header = false)
-        elseif type == "Random"
-            orb = readdlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_maxrand_$(maxrand)_base10.csv",BigInt, header = false)
-        end
+        orbit = readdlm("RAW_DATA/ORBITS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
         # this creates an array with "nothing" but that can receive matrices as elements
-        M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orb))
-        for j in 1:length(orb)
-            mvec = Algorithms.algorithm(orb[j])
-            M[j] = transpose(mvec) # the transpose is only to write every m-vector as a column of M
+        M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
+        for j in 1:length(orbit)
+            mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbit[j])
+            M[j] = transpose(mVector) # the transpose is only to write every m-vector as a column of M
         end
         return(M)
     end
@@ -97,31 +85,23 @@ end
 
 # This module contains the function that saves the M matrix and coalesce it, saving it finally as .csv
 # and as a square matrix.
-module SavingPowerOf2
+module SavingOrbitsPowerOf2
 
     import Main.OrbitPowersOf2
-    import Main.blocksize, Main.type, Main.vecsize, Main.maxrand
+    import Main.primeBlockSize, Main.type, Main.mVectorSize, Main.MaxRand
     using CSV
     using DataFrames
     using DelimitedFiles
 
-    function savingpowerof2()
-        for i in 1:factorial(blocksize)
-            println(i/factorial(blocksize)*100)
+    function savingorbitpowerof2()
+        for i in 1:factorial(primeBlockSize)
+            println(i/factorial(primeBlockSize)*100)
             M = OrbitPowersOf2.orbitpowerof2(i; type)
-            if type == "Prime"
-                writedlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_power_of_2.csv",M)
-                Ms = CSV.read("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_power_of_2.csv",DataFrame)
-                Ms = coalesce.(Ms, 0)
-                Ms = Array(Ms[:,:])
-                writedlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_blocksize_$(blocksize)_power_of_2.csv",Ms)
-            elseif type == "Random"
-                writedlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_maxrand_$(maxrand)_power_of_2.csv",M)
-                Ms = CSV.read("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_maxrand_$(maxrand)_power_of_2.csv",DataFrame)
-                Ms = coalesce.(Ms, 0)
-                Ms = Array(Ms[:,:])
-                writedlm("RAW_DATA/ORBITS/orb_n_0_$(i)_$(type)_vecsize_$(vecsize)_maxrand_$(maxrand)_power_of_2.csv",Ms)
-            end
+            writedlm("RAW_DATA/ORBITS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M)
+            M = CSV.read("RAW_DATA/ORBITS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", DataFrame)
+            M = coalesce.(M, 0)
+            M = Array(M[:,:])
+            writedlm("RAW_DATA/ORBITS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M)
         end
     end
 end

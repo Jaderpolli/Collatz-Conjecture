@@ -1,20 +1,20 @@
 include("initial_condition_modules.jl")
 
-import Main.Algorithms
-import Main.InitialConditions
-import Main.Saving
+import Main.AlgorithmsOfmVectors
+import Main.InitialConditionsGenerator
+import Main.SavingInitialConditions
 
 # variables of creation of initial conditions
 
-vecsize = 100
-maxrand = 10
-blocksize = 4
+mVectorSize = 100
+MaxRand = 10
+primeBlockSize = 4
 type = "Random"
 
-var = (vecsize, maxrand, blocksize, type)
+var = (mVectorSize, MaxRand, primeBlockSize, type)
 
 using DelimitedFiles
 writedlm("RAW_DATA/INITIAL_CONDITIONS/variables_n_0_$(type).dat",var)
 
-Saving.saving_powers_of_2(vecsize, maxrand, blocksize; type)
-Saving.saving_base10(vecsize, maxrand, blocksize; type)
+SavingInitialConditions.saving_powers_of_2(mVectorSize, MaxRand, primeBlockSize; type)
+SavingInitialConditions.saving_base10(mVectorSize, MaxRand, primeBlockSize; type)
