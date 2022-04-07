@@ -20,22 +20,22 @@ module StationaryOrbits
         return(orbit,γ₂)
     end
 
-    function fit_gamma_2(orbit, γ₂)
+    function fitOrbitGamma_2(orbit, γ₂)
         Δx = length(orbit)
-        fit = zeros(Δx)
+        fitOrbit = zeros(Δx)
         for i in 1:Δx
-            fitFunction[i] = orbit[1]+γ₂*i
+            fitOrbit[i] = orbit[1]+γ₂*i
         end
-        return(fitFunction)
+        return(fitOrbit)
     end
 
-    function stacionary(orbit, fitFunction)
+    function stationary(orbit, fitOrbit)
         Δx = length(orbit)
-        differenceOrbitFit = zeros(Δx)
+        stacionaryOrbit = zeros(Δx)
         for i in 1:Δx
-            differenceOrbitFit[i] = orbit[i] - fitFunction[i]
+            stationaryOrbit[i] = orbit[i] - fitOrbit[i]
         end
-        return(differenceOrbitFit)
+        return(stationaryOrbit)
     end
 end
 
@@ -43,15 +43,30 @@ module PowerSpectra
     using FFTW
     using LsqFit
 
-
     import Main.StationaryOrbits
     function powerspectrum()
-        orb_gamma = StationaryOrbits.gamma_2(i; type)
-        orb = orb_gamma[1]
-        γ₂ = orb_gamma[2]
-        fit = fit_gamma_2(orb,γ₂)
-        dif = stacionary(orb,fit)
-        fft_dif = abs.(fft(dif))
-        ps_dif = fft_dif.^2
+        orbit_gamma = StationaryOrbits.gamma_2(i; type)
+        orbit = orbit_gamma[1]
+        γ₂ = orbit_gamma[2]
+
+        fitOrbit = StationaryOrbits.fitOrbitGamma_2(orbit,γ₂)
+        stationaryOrbit = StationaryOrbits.stacionary(orbit, fitOrbit)
+
+        fftStationaryOrbit = fftshift(abs.(fft(stationaryOrbit)))
+
+        powerSpectraOfStationary = fftStationaryOrbit.^2
+        frequencies = fftshift(fftfreq(length(powerSpectraOfStationary)))
+
+        i = 1
+        while frequencies[i] ≤ 0
+            frequencies = frequencies[i+1:end]
+        end
+        powerSpectraOfStationary = powerSpectraOfStationary[1+(end-length(frequencies)):end]
+
+        return(frequencies, powerSpectraOfStationary)
+    end
+
+    function fitPowerSpectra(frequencies, powerSpectraOfStacionary)
+
     end
 end
