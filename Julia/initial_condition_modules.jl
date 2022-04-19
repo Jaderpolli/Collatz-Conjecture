@@ -60,7 +60,7 @@ module InitialConditionsGenerator
                 for j in 2:round(Int,mVectorSize/primeBlockSize)
                     n₀ = hcat(n₀,transpose(allprimeblocks[i])) #concatenating the blocks
                 end
-                setOfn₀[i,:] = n₀ #each row is one initial condition
+                setOfn₀[i,:] = n₀ #each line is one initial condition
             end
         elseif type == "Random"
             setOfn₀ = zeros(Int64, factorial(primeBlockSize), mVectorSize+1)
