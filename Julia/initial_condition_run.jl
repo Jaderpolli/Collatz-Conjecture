@@ -4,7 +4,7 @@ import Main.AlgorithmsOfmVectors
 import Main.InitialConditionsGenerator
 import Main.SavingInitialConditions
 
-mkpath("RAW_DATA")
+mkpath("RAW_DATA/INITIAL_CONDITIONS")
 
 # variables of creation of initial conditions
 

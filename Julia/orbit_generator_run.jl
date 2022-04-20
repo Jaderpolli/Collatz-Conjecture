@@ -3,7 +3,7 @@ include("orbit_generator_modules.jl")
 # If you will run SavingBase10, then you should do it BEFORE SavingPowerOf2,
 # because PowerOf2 reads from the base10 that has been generated.
 
-mkpath("RAW_DATA")
+mkpath("RAW_DATA/ORBITS")
 
 # variables of creation of initial conditions
 
