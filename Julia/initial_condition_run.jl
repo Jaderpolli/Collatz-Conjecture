@@ -4,6 +4,8 @@ import Main.AlgorithmsOfmVectors
 import Main.InitialConditionsGenerator
 import Main.SavingInitialConditions
 
+mkpath("RAW_DATA")
+
 # variables of creation of initial conditions
 
 mVectorSize = 180 #this value is picked so that it is the closest to 200 (the best size for the purposes)

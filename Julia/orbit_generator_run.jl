@@ -3,6 +3,8 @@ include("orbit_generator_modules.jl")
 # If you will run SavingBase10, then you should do it BEFORE SavingPowerOf2,
 # because PowerOf2 reads from the base10 that has been generated.
 
+mkpath("RAW_DATA")
+
 # variables of creation of initial conditions
 
 mVectorSize = 180 #this value is picked so that it is the closest to 200 (the best size for the purposes)
