@@ -1,10 +1,9 @@
-include("stationary_orbits_modules.jl")
+include("power_spectra_modules.jl")
 
-import Main.StationaryOrbits
-import Main.SavingStationaryOrbits
+import Main.PowerSpectra
 
-mkpath("DATA/GAMMA_2")
-mkpath("DATA/STATIONARY_ORBITS")
+mkpath("DATA/POWER_SPECTRA_STATIONARY")
+mkpath("DATA/POWER_SPECTRA_STATIONARY_FIT")
 
 mVectorSize = 180
 MaxRand = 10
@@ -20,12 +19,10 @@ function main()
                 println(
                 100*(k/(factorial(primeBlockSize))*1/((maximumPrimeBlockSize-1)*(length(types))) +(j-2)/((maximumPrimeBlockSize-1)*(length(types)))+(i-1)/length(types))
                 )
-                SavingStationaryOrbits.savinggamma2(k, mVectorSize, MaxRand, primeBlockSize; type)
-                SavingStationaryOrbits.savingstationary(k, mVectorSize, MaxRand, primeBlockSize; type)
+                # HERE I SHOULD CALL THE FUNCTIONS FROM MODULES AND SAVE THE POWER SPECTRA AND FITS
             end
         end
     end
 end
-
 
 main()
