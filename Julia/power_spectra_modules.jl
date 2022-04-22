@@ -1,21 +1,12 @@
-using DelimitedFiles
-
 module PowerSpectra
     using FFTW
     using LsqFit
+    using DelimitedFiles
 
-    import Main.StationaryOrbits
-    function powerspectrum()
-        orbit_gamma = StationaryOrbits.gamma_2(i; type)
-        orbit = orbit_gamma[1]
-        γ₂ = orbit_gamma[2]
-
-        fitOrbit = StationaryOrbits.fitOrbitGamma_2(orbit,γ₂)
-        stationaryOrbit = StationaryOrbits.stacionary(orbit, fitOrbit)
-
+    function powerspectrum(stationaryOrbit)
         fftStationaryOrbit = fftshift(abs.(fft(stationaryOrbit)))
 
-        powerSpectraOfStationary = fftStationaryOrbit.^2
+        powerSpectraOfStationary = 1/length(stationaryOrbit).*fftStationaryOrbit.^2
         frequencies = fftshift(fftfreq(length(powerSpectraOfStationary)))
 
         i = 1
@@ -25,6 +16,14 @@ module PowerSpectra
         powerSpectraOfStationary = powerSpectraOfStationary[1+(end-length(frequencies)):end]
 
         return(frequencies, powerSpectraOfStationary)
+    end
+
+    function savingpowerspectrum(i, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
+        stationaryOrbit = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", header = false)
+        frequencies = powerspectrum(stationaryOrbit)[1]
+        powerSpectraOfStationary = powerspectrum(stationaryOrbit)[2]
+        pairF_PS = hcat(frequencies,powerSpectraOfStationary)
+        writedlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", pairF_PS, header = false)
     end
 
     function fitPowerSpectra(frequencies, powerSpectraOfStacionary)

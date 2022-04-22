@@ -19,7 +19,7 @@ function main()
                 println(
                 100*(k/(factorial(primeBlockSize))*1/((maximumPrimeBlockSize-1)*(length(types))) +(j-2)/((maximumPrimeBlockSize-1)*(length(types)))+(i-1)/length(types))
                 )
-                # HERE I SHOULD CALL THE FUNCTIONS FROM MODULES AND SAVE THE POWER SPECTRA AND FITS
+                PowerSpectra.savingpowerspectrum(k,mVectorSize, MaxRand, primeBlockSize; type)
             end
         end
     end
