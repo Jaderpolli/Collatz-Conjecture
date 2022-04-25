@@ -20,6 +20,7 @@ function main()
                 100*(k/(factorial(primeBlockSize))*1/((maximumPrimeBlockSize-1)*(length(types))) +(j-2)/((maximumPrimeBlockSize-1)*(length(types)))+(i-1)/length(types))
                 )
                 PowerSpectra.savingpowerspectrum(k,mVectorSize, MaxRand, primeBlockSize; type)
+                PowerSpectra.savingfitPowerSpectra(k,mVectorSize, MaxRand, primeBlockSize; type)
             end
         end
     end
