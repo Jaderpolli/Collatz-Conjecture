@@ -18,6 +18,7 @@ module DFA
     end
 
     function dfa(x,
+                order::Int64=1,
                 Δn₀::Int64=4,
                 Δnₘ::Int64=div(length(x),2))
         x = integration(x)
@@ -34,11 +35,15 @@ module DFA
             for j in 1:div(N,Δn)
                 dn = range((j-1)*Δn+1,j*Δn)
                 segment = segmentation[j,:]
-                fit = linear_fit(dn, segment)
+                if order == 1
+                    fit = linear_fit(dn, segment)
+                else
+                    fit = poly_fit(dn, segment, order)
+                end
                 segmentFit = fit[1] .+ fit[2].*dn
                 difSegmentToFit[dn] = segment .- segmentFit
             end
-            fluctuation = 1/N*sum(difSegmentToFit.^2)
+            fluctuation = sqrt(sum(difSegmentToFit.^2)/N)
             fluctuations = vcat(fluctuations,fluctuation)
         end
         return(Δns, fluctuations)
@@ -49,11 +54,19 @@ module DFA
                         MaxRand::Int64=10,
                         primeBlockSize::Int64=4;
                         type::String)
-        stationaryOrbit = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", header = false)
-        n = dfa(stationaryOrbit)[1]
-        detrendedFluctuation = dfa(stationaryOrbit)[2]
-        data = hcat(n,detrendedFluctuation)
-        writedlm("DATA/DFA_STATIONARY/dfa_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", data)
+        Orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
+        LogOrbit = log2.(Orbit)
+        N = length(LogOrbit)
+        differences = []
+        for j in 1:N-1
+            difference = LogOrbit[j+1]-LogOrbit[j]
+            differences = vcat(differences, difference)
+        end
+        data = dfa(differences, 1)
+        n = data[1]
+        detrendedFluctuation = data[2]
+        savingdata = hcat(n,detrendedFluctuation)
+        writedlm("DATA/DFA_ORBIT/dfa_orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", savingdata)
     end
 
 end #module
