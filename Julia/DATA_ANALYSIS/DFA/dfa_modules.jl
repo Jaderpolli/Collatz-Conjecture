@@ -20,6 +20,7 @@ module DFA
     function dfa(x,
                 Δn₀::Int64=4,
                 Δnₘ::Int64=div(length(x),2))
+        x = integration(x)
         N = length(x)
         fluctuations = []
         Δns = range(Δn₀,Δnₘ)
