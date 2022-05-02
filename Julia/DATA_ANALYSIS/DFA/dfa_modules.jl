@@ -41,9 +41,9 @@ module DFA
                     fit = poly_fit(dn, segment, order)
                 end
                 segmentFit = fit[1] .+ fit[2].*dn
-                difSegmentToFit[dn] = segment .- segmentFit
+                difSegmentToFit[dn] = (segment .- segmentFit).^2
             end
-            fluctuation = sqrt(sum(difSegmentToFit.^2)/N)
+            fluctuation = sqrt(sum(difSegmentToFit)/N)
             fluctuations = vcat(fluctuations,fluctuation)
         end
         return(Δns, fluctuations)
@@ -54,19 +54,36 @@ module DFA
                         MaxRand::Int64=10,
                         primeBlockSize::Int64=4;
                         type::String)
-        Orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
-        LogOrbit = log2.(Orbit)
+        stationaryOrbit = readdlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", header = false)
+        #=LogOrbit = log2.(Orbit)
         N = length(LogOrbit)
         differences = []
         for j in 1:N-1
             difference = LogOrbit[j+1]-LogOrbit[j]
             differences = vcat(differences, difference)
-        end
-        data = dfa(differences, 1)
+        end=#
+        data = dfa(stationaryOrbit, 1)
         n = data[1]
         detrendedFluctuation = data[2]
         savingdata = hcat(n,detrendedFluctuation)
-        writedlm("DATA/DFA_ORBIT/dfa_orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", savingdata)
+        writedlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", savingdata)
+    end
+
+    function fitdfa(n, dfa)
+        fit = power_fit(n[6:end],dfa[6:end])
+        return(fit[1],fit[2])
+    end
+
+    function savingfitdfa(i,
+                        mVectorSize::Int64=100,
+                        MaxRand::Int64=10,
+                        primeBlockSize::Int64=4;
+                        type::String)
+        data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv")
+        n = data[:,1]
+        dfa = data[:,2]
+        fits = fitdfa(n,dfa)
+        writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", fits)
     end
 
 end #module
