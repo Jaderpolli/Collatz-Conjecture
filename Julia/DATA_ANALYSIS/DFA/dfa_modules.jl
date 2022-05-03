@@ -28,7 +28,7 @@ module DFA
         for Δn in Δn₀:Δnₘ
             segmentation = zeros(div(N,Δn),Δn)
             segmentation[1,:] = x[1:Δn]
-            for i in 1:div(N,Δnₘ)-1
+            for i in 1:div(N,Δn)-1
                 segmentation[i+1,:] = x[i*Δn+1:i*Δn+Δn]
             end
             difSegmentToFit = zeros(N)
@@ -70,7 +70,7 @@ module DFA
     end
 
     function fitdfa(n, dfa)
-        fit = power_fit(n[6:end],dfa[6:end])
+        fit = power_fit(n[6:div(length(n),5)],dfa[6:div(length(n),5)])
         return(fit[1],fit[2])
     end
 
@@ -82,7 +82,7 @@ module DFA
         data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv")
         n = data[:,1]
         dfa = data[:,2]
-        fits = fitdfa(n,dfa)
+        fits = fitdfa(n,dfa, )
         writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", fits)
     end
 
