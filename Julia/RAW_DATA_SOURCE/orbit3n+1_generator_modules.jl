@@ -1,33 +1,25 @@
 #= Objective: create the modules that creates the .csv
-of the orbits of the accelerated collatz map in base10
+of the orbits of the original collatz map in base10
 and powers of 2 for every initial
 condition at "RAW_DATA/INITIAL_CONDITIONS/" and store them
-at "RAW_DATA/ORBITS/"
+at "RAW_DATA/ORBITS3n+1/"
 =#
 
 using CSV
 using DataFrames
 using DelimitedFiles
 
-#= These are the variables that define what type of initial condition is being used
-type = "Prime"
-var = readdlm("RAW_DATA/INITIAL_CONDITIONS/variables_n_0_type_$(type)_MaxRand_$().dat", header = false)
-var = Array(var)
-mVectorSize = var[1] #size of the m-vector
-MaxRand = var[2] #when type = "Random" this is the maximum value possible
-primeBlockSize = var[3] # when type = "Prime" this is the number of the first primes taken =#
-
 # this module has the CollatzMap function. It is used the accelerated collatz function
-module CollatzMap
+module CollatzMapOriginal
     function collatz(n::BigInt)
-         n % 2 == 0 ? n = div(n,2) : n = div((3n+1),2) # if
-         return(n)
-     end
+        n % 2 == 0 ? n = div(n,2) : n = 3*n+1
+        return(n)
+    end
 end
 
 # this module contains the function that generates the orbit in base 10
 module OrbitsBase10
-    import Main.CollatzMap
+    import Main.CollatzMapOriginal
     using CSV
     using DelimitedFiles
     using DataFrames
@@ -37,7 +29,7 @@ module OrbitsBase10
         iterateVariable = BigInt(n₀[1,1])
         orbit = BigInt[iterateVariable]
         while iterateVariable > 1
-            iterateVariable = CollatzMap.collatz(iterateVariable)
+            iterateVariable = CollatzMapOriginal.collatz(iterateVariable)
             push!(orbit, iterateVariable)
         end
         return(orbit)
@@ -47,7 +39,7 @@ module OrbitsBase10
         iterateVariable = x
         orbit = BigInt[iterateVariable]
         while iterateVariable > 1
-            iterateVariable = CollatzMap.collatz(iterateVariable)
+            iterateVariable = CollatzMapOriginal.collatz(iterateVariable)
             push!(orbit, iterateVariable)
         end
         return(orbit)
@@ -57,7 +49,7 @@ end
 # this module saves the orbit in base 10 into a .csv file
 module SavingOrbitsBase10
 
-    import Main.CollatzMap
+    import Main.CollatzMapOriginal
     import Main.OrbitsBase10
     using CSV
     using DataFrames
@@ -67,7 +59,7 @@ module SavingOrbitsBase10
         for i in 1:factorial(primeBlockSize)
             println(i/factorial(primeBlockSize)*100) #time counter
             orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, primeBlockSize; type)
-            writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit, header = false)
+            writedlm("RAW_DATA/ORBITS_3n+1/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit, header = false)
         end
     end
 end
@@ -81,7 +73,7 @@ module OrbitPowersOf2
     using DelimitedFiles
 
     function orbitpowerof2(i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
-        orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
+        orbit = readdlm("RAW_DATA/ORBITS_3n+1/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
         # this creates an array with "nothing" but that can receive matrices as elements
         M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
         for j in 1:length(orbit)
@@ -105,7 +97,7 @@ module SavingOrbitsPowerOf2
         for i in 1:factorial(primeBlockSize)
             println(i/factorial(primeBlockSize)*100)
             M = OrbitPowersOf2.orbitpowerof2(i, mVectorSize, MaxRand, primeBlockSize; type)
-            writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M, header = false)
+            writedlm("RAW_DATA/ORBITS_3n+1/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M, header = false)
         end
     end
 end
