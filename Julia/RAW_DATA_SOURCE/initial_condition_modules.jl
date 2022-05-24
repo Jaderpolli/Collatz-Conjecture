@@ -132,3 +132,69 @@ module SavingInitialConditions
         end
     end
 end
+
+#= While investigating different initial conditions, the hypothesis that conditions
+whose initial m-vector is composed by 2 or 3 primes periodically give rise to deviations
+in the autocorrelation function
+
+The module bellow should create various larger initial conditions with 2 or 3 primes
+repeated.
+=#
+
+module PrimeSpecialInitialConditions
+    using Primes
+    using Random
+    using Combinatorics
+    using DelimitedFiles
+    import Main.AlgorithmsOfmVectors
+
+    function primespecialinitialcondition(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2)
+        primeblock = Int64[]
+        for i in 1:primeOrder
+            primeblock = vcat(primeblock, prime(i))
+        end
+        allprimeblocks = collect(combinations(primeblock,primeBlockSize))
+        setOfn₀ = zeros(Int64, length(allprimeblocks), mVectorSize+1)
+        for i in 1:length(allprimeblocks)
+            n₀ = hcat(0,transpose(allprimeblocks[i])) #the line-array of the i-th building block
+            for j in 2:round(Int,mVectorSize/primeBlockSize)
+                n₀ = hcat(n₀,transpose(allprimeblocks[i])) #concatenating the blocks
+            end
+            setOfn₀[i,:] = n₀ #each line is one initial condition
+        end
+        return(setOfn₀)
+    end
+
+    #=
+    Next we define a new function to save the special power of 2 initial conditions
+    =#
+
+    function saving_powers_of_2(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2; type::String)
+        # from definition:
+        # initialcondition(mVectorSize::Int=100,MaxRand::Int=10, primeBlockSize::Int=4; type::String)
+        setOfn₀ = primespecialinitialcondition(primeOrder, mVectorSize, primeBlockSize)
+
+        # this if condition exists to assure that the number of created initial conditions
+        # is the same as expected by the factorial of primeBlockSize
+        for i in 1:length(setOfn₀[:,1])
+            fname = "RAW_DATA/SPECIAL_INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_power_of_2.csv"
+            writedlm(fname, setOfn₀[i,:])
+        end
+    end
+
+    function saving_base10(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2; type::String)
+        primeblock = Int64[]
+        for i in 1:primeOrder
+            primeblock = vcat(primeblock, prime(i))
+        end
+        L = length(collect(combinations(primeblock,primeBlockSize)))
+        for i in 1:L
+            fname_power_of_2 = "RAW_DATA/SPECIAL_INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_power_of_2.csv"
+            fname_base10 = "RAW_DATA/SPECIAL_INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv"
+            mVector = readdlm(fname_power_of_2,Int64)
+            mVector = Vector(mVector[:,1])
+            base10number = AlgorithmsOfmVectors.rev_algorithm_m_vector(mVector)
+            writedlm(fname_base10, base10number)
+        end
+    end
+end

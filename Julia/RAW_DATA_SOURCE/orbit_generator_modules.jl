@@ -8,6 +8,7 @@ at "RAW_DATA/ORBITS/"
 using CSV
 using DataFrames
 using DelimitedFiles
+using Primes
 
 #= These are the variables that define what type of initial condition is being used
 type = "Prime"
@@ -52,6 +53,17 @@ module OrbitsBase10
         end
         return(orbit)
     end
+
+    function specialorbitbase10(i::Int64, primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
+        n₀ = readdlm("RAW_DATA/SPECIAL_INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv",BigInt, header = false)
+        iterateVariable = BigInt(n₀[1,1])
+        orbit = BigInt[iterateVariable]
+        while iterateVariable > 1
+            iterateVariable = CollatzMap.collatz(iterateVariable)
+            push!(orbit, iterateVariable)
+        end
+        return(orbit)
+    end
 end
 
 # this module saves the orbit in base 10 into a .csv file
@@ -60,6 +72,8 @@ module SavingOrbitsBase10
     import Main.CollatzMap
     import Main.OrbitsBase10
     using CSV
+    using Primes
+    using Combinatorics
     using DataFrames
     using DelimitedFiles
 
@@ -68,6 +82,19 @@ module SavingOrbitsBase10
             println(i/factorial(primeBlockSize)*100) #time counter
             orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, primeBlockSize; type)
             writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit, header = false)
+        end
+    end
+
+    function savingspecialorbitbase10(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
+        primeblock = Int64[]
+        for i in 1:primeOrder
+            primeblock = vcat(primeblock, prime(i))
+        end
+        L = length(collect(combinations(primeblock,primeBlockSize)))
+        for i in 1:L
+            println(i/L*100) #time counter
+            orbit= OrbitsBase10.specialorbitbase10(i, primeOrder, mVectorSize, primeBlockSize; type)
+            writedlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit, header = false)
         end
     end
 end
@@ -90,6 +117,17 @@ module OrbitPowersOf2
         end
         return(M)
     end
+
+    function specialorbitpowerof2(i::Int64, primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
+        orbit = readdlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
+        # this creates an array with "nothing" but that can receive matrices as elements
+        M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
+        for j in 1:length(orbit)
+            mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbit[j])
+            M[j] = transpose(mVector) # the transpose is only to write every m-vector as a line of M
+        end
+        return(M)
+    end
 end
 
 # This module contains the function that saves the M matrix and coalesce it, saving it finally as .csv
@@ -100,12 +138,27 @@ module SavingOrbitsPowerOf2
     using CSV
     using DataFrames
     using DelimitedFiles
+    using Primes
+    using Combinatorics
 
     function savingorbitpowerof2(mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
         for i in 1:factorial(primeBlockSize)
             println(i/factorial(primeBlockSize)*100)
             M = OrbitPowersOf2.orbitpowerof2(i, mVectorSize, MaxRand, primeBlockSize; type)
             writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M, header = false)
+        end
+    end
+
+    function savingspecialorbitpowerof2(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
+        primeblock = Int64[]
+        for i in 1:primeOrder
+            primeblock = vcat(primeblock, prime(i))
+        end
+        L = length(collect(combinations(primeblock,primeBlockSize)))
+        for i in 1:L
+            println(i/L*100)
+            M = OrbitPowersOf2.specialorbitpowerof2(i, primeOrder, mVectorSize, primeBlockSize; type)
+            writedlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M, header = false)
         end
     end
 end
