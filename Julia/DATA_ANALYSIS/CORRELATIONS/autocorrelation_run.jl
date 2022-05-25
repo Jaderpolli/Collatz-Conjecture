@@ -1,7 +1,7 @@
 include("autocorrelation_modules.jl")
 import Main.SavingAutocorrelation
 
-function main()
+function acf()
     mkpath("DATA/ACF")
 
     mVectorSize = 180
@@ -24,4 +24,16 @@ function main()
     end
 end
 
-main()
+function acfspecial()
+    mkpath("DATA/ACF")
+
+    primeOrder = 5
+    mVectorSize = 1002 #divisible by 2 and 3 (the primeblocksizes below)
+    primeBlockSize = [2, 3]
+    type = "Prime"
+    for j in primeBlockSize
+        SavingAutocorrelation.savingSpecialAutocorrelation(primeOrder,mVectorSize,j; type)
+    end
+end
+
+acfspecial()
