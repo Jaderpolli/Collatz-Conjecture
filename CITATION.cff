@@ -1,0 +1,12 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit httpsbit.lycffinit to generate yours today!
+
+cff-version 1.2.0
+title collatz-map
+message Use this to cite this repository
+type software
+authors
+  - given-names Jaderson Guilherme
+    name-particle Polli
+    email jaderpolli99@gmail.com
+    affiliation Universidade Federal do Paraná
