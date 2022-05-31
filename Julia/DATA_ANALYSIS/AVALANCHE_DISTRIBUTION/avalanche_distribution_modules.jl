@@ -59,6 +59,44 @@ module AvalanchesDistributions
     end
 end
 
-module AvalancheDistance
+module AvalanchesDistance
 
+    using StatsBase
+    using Plots
+    using DelimitedFiles
+
+    function distanceAvalanches(m1)
+        m1Values = reshape([],0,2)
+        i = 1
+        for j in 1:length(m1)-1
+            if m1[j] == 0 && m1[j+1] > 0
+                pair = [m1[j+1] j+1-i]
+                m1Values = vcat(m1Values,pair)
+                i = j+1
+            else
+                nothing
+            end
+        end
+        avgs = reshape([],0,2)
+        for i in 1:maximum(m1Values[:,1])
+            indexs = findall(isequal(i), m1Values[:,1])
+            (isequal(length(indexs),0) || isequal(length(indexs),1)) && continue
+            distances = []
+            for j in 1:length(indexs)-1
+                d = sum(m1Values[indexs[j]:indexs[j+1]])
+                distances = vcat(distances, d)
+            end
+            avgds = mean(distances)
+            data = [i avgds]
+            avgs = vcat(avgs, data)
+        end
+        return(avgs)
+    end
+
+    function savingdistanceavalanches(i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4;  type::String)
+        M = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", header = false)
+        m1 = M[:,1]
+        avgs = distanceAvalanches(m1)
+        writedlm("DATA/AVALANCHES_DISTANCE/avalance_distance_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", avgs, header = false)
+    end
 end
