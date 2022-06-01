@@ -23,6 +23,16 @@ module AlgorithmsOfmVectors
         return(mVector)
     end
 
+    function algorithm_m1(base10number::BigInt)
+        number = BigInt(base10number)
+        m1 = 0
+        while number % 2 == 0
+                number = div(number,2)
+                m1 += 1
+        end
+        return(m1)
+    end
+
     function rev_algorithm_m_vector(mVector)
         base10number = BigInt(0)
         for i in 1:length(mVector)

@@ -2,6 +2,7 @@ using Plots
 using DelimitedFiles
 using StatsBase
 using LaTeXStrings
+using Plots.PlotMeasures
 
 pasta = "FIGURES/AVALANCHES_FIGURES"
 mkpath(pasta)
