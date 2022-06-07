@@ -22,7 +22,7 @@ end
 module SavingIncrements
     using DelimitedFiles
     using Primes
-    using Combinatorics 
+    using Combinatorics
     import Main.Increments
 
     function savingLogarithmcIncrements(k::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
@@ -51,4 +51,12 @@ module SavingIncrements
         end
     end
 
+    function savingn06SingleDouble()
+        orbit = readdlm("RAW_DATA/ORBITS/orb_n006.dat", BigInt, header = false)
+        increments = Increments.logarithmicIncrements(orbit)
+        single_increment = Float32.(increments)
+        double_increment = Float64.(increments)
+        writedlm("DATA/INCREMENTS/single_log_increments_n006.dat", single_increment)
+        writedlm("DATA/INCREMENTS/double_log_increments_n006.dat", double_increment)
+    end
 end

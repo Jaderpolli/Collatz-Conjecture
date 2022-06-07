@@ -59,4 +59,8 @@ function specialincrements()
     end
 end
 
-specialincrements()
+function simpledoubleincrements()
+    SavingIncrements.savingn06SingleDouble()
+end
+
+simpledoubleincrements()
