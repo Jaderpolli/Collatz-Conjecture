@@ -10,7 +10,7 @@ function plotACF()
     mVectorSize = 180
 
     MaxRand = 10
-    maximumPrimeBlockSize =  6
+    maximumPrimeBlockSize =  2
     types = ["Random", "Prime"]
 
     for j in 2:maximumPrimeBlockSize
@@ -28,13 +28,14 @@ function plotACF()
                 acf_prim = readdlm("DATA/ACF/acf_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", BigFloat, header = false)
                 high_corr_prim = highCorrelations(acf_prim)
 
-                figure = plot(layout = (2,2), size = (800,400), minorticks = true,  dpi = 200)
-                figure = plot!(log.(orbit_rand),
+                figure = plot(layout = (2,1), fontfamily = "Computer Modern",size = (500,350), #minorticks = true,
+                        dpi = 500)
+                #=figure = plot!(log.(orbit_rand),
                                     title = "Random Initial "*L"m-"*"vector",
                                     fontfamily = "Computer Modern",
                                     left_margin = 5mm,
                                     subplot = 1,
-                                    label = "Initial Condition"*L"(\mathrm{rand}, %$(k), %$(primeBlockSize))",
+                                    label = "Initial Condition"*L" = \mathrm{rand}",
                                     legend = :bottomleft,
                                     xlabel = L"t",
                                     ylabel = L"\log_2(f(t))",
@@ -43,46 +44,51 @@ function plotACF()
                                     subplot =2,
                                     legend = :bottomleft,
                                     title = "Prime Initial "*L"m-"*"vector",
-                                    label = label = "Initial Condition"*L"(\mathrm{prime}, %$(k), %$(primeBlockSize))",
+                                    label = label = "Initial Condition"*L" = \mathrm{prime}, b = %$(primeBlockSize)",
                                     xlabel = L"t",
-                                    lc = :black)
+                                    lc = :black)=#
                 figure = plot!(abs.(acf_rand),
-                                    subplot = 3,
-                                    minorgrid = true,
+                                    subplot = #=3,=# 1,
+                                    #minorgrid = true,
                                     lc = :blue,
                                     left_margin = 5mm,
                                     yticks = [0.0000001,0.000001,0.0001,0.001,0.01,0.1,1],
-                                    xticks = [1, 10, 100, 1000], xlabel = L"\tau", ylabel = L"C( \tau)",
+                                    xticks = [1, 10, 100, 1000], #=xlabel = L"\tau",=# ylabel = L"C( \tau)",
+                                    xlabel = "", yguidefontrotation = -90,
                                     yscale = :log10,
                                     xscale = :log10,
                                     legend = :bottomleft,
                                     label = L"C( \tau)")
                 figure = scatter!(high_corr_rand[:,1],high_corr_rand[:,2],
-                                    subplot = 3, ms = 4,
+                                    subplot = #=3=# 1, ms = 4,
                                     label = L"C(\tau) > 0.1",
                                     lc = :green,
                                     markerstrokewidth = 0,
                                     yscale = :log10,
                                     xscale = :log10,
-                                    bottom_margin = 5mm)
+                                    annotation = ((0.5,0.9), L"(a)"))
+                                    #bottom_margin = 5mm)
                 figure = plot!(abs.(acf_prim),
-                                    lc = :red, xlabel = L"\tau",
+                                    lc = :red, xlabel = L"\tau", ylabel = L"C(\tau)",
+                                    yguidefontrotation = -90,
                                     label = L"C(\tau)",
                                     xticks = [1, 10, 100, 1000],
-                                    subplot = 4,
-                                    minorgrid = true,
+                                    yticks = [0.0000001,0.000001,0.0001,0.001,0.01,0.1,1],
+                                    subplot =#= 4=# 2,
+                                    #minorgrid = true,
                                     yscale = :log10,
                                     xscale = :log10,
                                     legend = :bottomleft)
                 figure = scatter!(high_corr_prim[:,1],high_corr_prim[:,2],
                                     label = L"C(\tau) > 0.1",
-                                    subplot = 4,
+                                    subplot = #=4=# 2,
                                     ms = 4,
                                     markerstrokewidth = 0,
                                     yscale = :log10,
                                     xscale = :log10,
-                                    bottom_margin = 5mm)
-                png(figure, "FIGURES/ACF_FIGURES/acf_n_0_$(k)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).png")
+                                    left_margin = 10mm,
+                                    annotation = ((0.5,0.9), L"(b)"))
+                png(figure, "FIGURES/ACF_FIGURES/paper_acf_n_0_$(k)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).png")
             end
     end
 end

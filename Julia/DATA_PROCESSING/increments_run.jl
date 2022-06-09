@@ -60,7 +60,7 @@ function specialincrements()
 end
 
 function simpledoubleincrements()
-    SavingIncrements.savingn06SingleDouble()
+    SavingIncrements.savingn05SingleDouble()
 end
 
 simpledoubleincrements()

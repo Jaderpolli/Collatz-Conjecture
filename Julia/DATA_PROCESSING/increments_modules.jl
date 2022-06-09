@@ -2,18 +2,29 @@ module Increments
 
 #this function probably will not be used, but is here for completeness
     function linearIncrements(x)
-        increments = zeros(BigFloat, length(x)-1)
+        increments = zeros(BigFloat, length(x)-1, 2)
         for i in 1:length(increments)
-            increments[i] = abs(x[i+1]-x[i])
+            increments[i,1] = i
+            increments[i,2] = abs(x[i+1]-x[i])
         end
         return(increments)
     end
 
     function logarithmicIncrements(x)
         logx = log2.(x)
-        increments = zeros(BigFloat, length(x)-1)
-        for i in 1:length(increments)
-            increments[i] = abs(logx[i+1]-logx[i])
+        increments = zeros(BigFloat, length(x)-1, 2)
+        for i in 1:length(increments[:,1])
+            increments[i,1] = i
+            increments[i,2] = abs(logx[i+1]-logx[i])
+        end
+        return(increments)
+    end
+
+    function floatlogarithmicIncrements(logx)
+        increments = zeros(eltype(logx), length(logx)-1, 2)
+        for i in 1:length(increments[:,1])
+            increments[i,1] = i
+            increments[i,2] = abs(logx[i+1]-logx[i])
         end
         return(increments)
     end
@@ -51,12 +62,14 @@ module SavingIncrements
         end
     end
 
-    function savingn06SingleDouble()
-        orbit = readdlm("RAW_DATA/ORBITS/orb_n006.dat", BigInt, header = false)
-        increments = Increments.logarithmicIncrements(orbit)
-        single_increment = Float32.(increments)
-        double_increment = Float64.(increments)
-        writedlm("DATA/INCREMENTS/single_log_increments_n006.dat", single_increment)
-        writedlm("DATA/INCREMENTS/double_log_increments_n006.dat", double_increment)
+    function savingn05SingleDouble()
+        orbit = readdlm("RAW_DATA/ORBITS/orb_n005.dat", BigInt, header = false)
+        singlelogorbit = Float32.(log10.(orbit))
+        doublelogorbit = Float64.(log10.(orbit))
+        writedlm("RAW_DATA/ORBITS/orb_n005_log10.dat", doublelogorbit, header = false)
+        single_increment = Increments.floatlogarithmicIncrements(singlelogorbit)
+        double_increment = Increments.floatlogarithmicIncrements(doublelogorbit)
+        writedlm("DATA/INCREMENTS/single_log_increments_n005.dat", single_increment)
+        writedlm("DATA/INCREMENTS/double_log_increments_n005.dat", double_increment)
     end
 end
