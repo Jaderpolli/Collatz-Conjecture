@@ -78,8 +78,50 @@ module InitialConditionsGenerator
                 n₀ = hcat(0,transpose(rand(1:MaxRand,mVectorSize))) #this will create one initial conditions
                 setOfn₀[i,:] = n₀ #this will construct the matrix with rows forming initial conditions
             end
+        elseif type == "Even"
+            evenblock = Int64[]
+            for i in 1:primeBlockSize
+                evenblock = vcat(evenblock, 2*i)
+            end
+            allevenblocks = collect(permutations(evenblock))
+            setOfn₀ = zeros(Int64, length(allevenblocks), mVectorSize+1)
+            for i in 1:length(allevenblocks)
+                n₀ = hcat(0,transpose(allevenblocks[i])) #the line-array of the i-th building block
+                for j in 2:round(Int64,mVectorSize/primeBlockSize)
+                    n₀ = hcat(n₀,transpose(allevenblocks[i])) #concatenating the blocks
+                end
+                setOfn₀[i,:] = n₀ #each line is one initial condition
+            end
+        elseif type == "Odd"
+            oddblock = Int64[]
+            for i in 1:primeBlockSize
+                oddblock = vcat(oddblock, 2*i-1)
+            end
+            alloddblocks = collect(permutations(oddblock))
+            setOfn₀ = zeros(Int64, length(alloddblocks), mVectorSize+1)
+            for i in 1:length(alloddblocks)
+                n₀ = hcat(0,transpose(alloddblocks[i])) #the line-array of the i-th building block
+                for j in 2:round(Int,mVectorSize/primeBlockSize)
+                    n₀ = hcat(n₀,transpose(alloddblocks[i])) #concatenating the blocks
+                end
+                setOfn₀[i,:] = n₀ #each line is one initial condition
+            end
+        elseif type == "Adjacent"
+            adjacentblock = Int64[]
+            for i in 1:primeBlockSize
+                adjacentblock = vcat(adjacentblock, i)
+            end
+            alladjacentblocks = collect(permutations(adjacentblock))
+            setOfn₀ = zeros(Int64, length(alladjacentblocks), mVectorSize+1)
+            for i in 1:length(alladjacentblocks)
+                n₀ = hcat(0,transpose(alladjacentblocks[i])) #the line-array of the i-th building block
+                for j in 2:round(Int,mVectorSize/primeBlockSize)
+                    n₀ = hcat(n₀,transpose(alladjacentblocks[i])) #concatenating the blocks
+                end
+                setOfn₀[i,:] = n₀ #each line is one initial condition
+            end
         else
-            println("Input of InitialCondition function should be 'Prime' or 'Random'") #error menssage
+            println("Input of InitialCondition function should be a type 'Random', 'Prime', 'Even', 'Odd' or 'Adjacent'") #error menssage
         end
         return(setOfn₀)
     end
