@@ -10,6 +10,14 @@ module StationaryOrbits
         return(orbit,γ₂)
     end
 
+    function gamma_2(orbit)
+        orbit = log2.(orbit)
+        Δy = orbit[end]-orbit[1]
+        Δx = length(orbit)
+        γ₂ = Δy/Δx
+        return(orbit,γ₂)
+    end
+
     function fitOrbitGamma_2(orbit, γ₂)
         Δx = length(orbit)
         fitOrbit = zeros(Δx)

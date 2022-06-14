@@ -2,8 +2,8 @@ module Increments
 
 #this function probably will not be used, but is here for completeness
     function linearIncrements(x)
-        increments = zeros(BigFloat, length(x)-1, 2)
-        for i in 1:length(increments)
+        increments = zeros(BigFloat, length(x), 2)
+        for i in 1:length(increments)-1
             increments[i,1] = i
             increments[i,2] = abs(x[i+1]-x[i])
         end
