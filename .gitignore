@@ -1,6 +1,8 @@
 *.csv
 *.dat
 *.png
+*.pdf
+*.eps
 *.gif
 .ipynb_checkpoints
 *.ipynb
