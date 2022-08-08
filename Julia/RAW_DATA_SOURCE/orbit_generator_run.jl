@@ -3,6 +3,8 @@ include("orbit_generator_modules.jl")
 import Main.SavingOrbitsPowerOf2
 import Main.SavingOrbitsBase10
 
+println("Rodando orbit_generator_run.jl")
+
 # If you will run SavingBase10, then you should do it BEFORE SavingPowerOf2,
 # because PowerOf2 reads from the base10 that has been generated.
 
@@ -11,45 +13,52 @@ function orbits_generators()
 
     # variables of creation of initial conditions
 
-    mVectorSize = 360 #this value is picked so that it is the closest to 200 (the best size for the purposes)
-                        #divisible by 2,3,4,5,6 that are the blocksizes of primes
+    mVectorSizes = [2100] #this value is picked so that it generate large enough orbits and is
+                        #divisible by 2,3,4,5 that are the blocksizes of primes
     MaxRand = 10
-    maximumPrimeBlockSize =  4 # with this variable, we create 1!+2!+3!+4!+5!+6!=873 initial conditions for each type (i.e. 1746 initial conditions)
-    types = ["Even", "Odd", "Adjacent"]
+    maximumBlockSize =  5 # with this variable, we create 1!+2!+3!+4!+5!=152 initial conditions for each type (i.e. 608 initial conditions)
+    types = ["Random"#=, "Prime", "Even", "Odd", "Pascal Triangle", "Oscilatory","Linear"=#]
+    #types = ["Linear"]
 
-    for i in 1:length(types)
-        type = types[i]
-        for j in 2:maximumPrimeBlockSize
-            primeBlockSize = j
-            println(
-            100*((j-2)/((maximumPrimeBlockSize-1)*(length(types)))+(i-1)/length(types))
-            )
-            SavingOrbitsBase10.savingorbitbase10(mVectorSize, MaxRand, primeBlockSize ;type)
+    Threads.@threads for mVectorSize in mVectorSizes
+        i = 0
+        #=Threads.@threads for type in types
+            i += 1
+            if type == "Linear"
+                mVectorSize = 180
+                BlockSizes = [30, 60, 180]
+                for BlockSize in BlockSizes
+                    SavingOrbitsBase10.savingorbitbase10(mVectorSize, MaxRand, BlockSize ;type)
+                end
+            else
+                for j in 4:maximumBlockSize
+                    BlockSize = j
+                    println(
+                    "orbitbase10 $(100*((j-2)/((maximumBlockSize-1)*(length(types)))+(i-1)/length(types))) type = $(type), BlockSize = $(BlockSize)"
+                    )
+                    SavingOrbitsBase10.savingorbitbase10(mVectorSize, MaxRand, BlockSize ;type)
+                end
+            end
         end
-    end
-
-    for i in 1:length(types)
-        type = types[i]
-        for j in 2:maximumPrimeBlockSize
-            primeBlockSize = j
-            println(
-            100*((j-2)/((maximumPrimeBlockSize-1)*(length(types)))+(i-1)/length(types))
-            )
-            SavingOrbitsPowerOf2.savingorbitpowerof2(mVectorSize, MaxRand, primeBlockSize ;type)
+        i = 0=#
+        Threads.@threads for type in types
+            i += 1
+            if type == "Linear"
+                mVectorSize = 180
+                BlockSizes = [#=30, 60,=# 180]
+                for BlockSize in BlockSizes
+                    SavingOrbitsPowerOf2.savingorbitpowerof2(mVectorSize, MaxRand, BlockSize ;type)
+                end
+            else
+                for j in 4:maximumBlockSize
+                    BlockSize = j
+                    println(
+                    "orbitpowersof2 $(100*((j-2)/((maximumBlockSize-1)*(length(types)))+(i-1)/length(types))) type = $(type), mVectorSize = $(mVectorSize)"
+                    )
+                    SavingOrbitsPowerOf2.savingorbitpowerof2(mVectorSize, MaxRand, BlockSize ;type)
+                end
+            end
         end
-    end
-end
-
-function specialorbits()
-    mkpath("RAW_DATA/SPECIAL_ORBITS")
-
-    primeOrder = 5
-    mVectorSize = 1002 #divisible by 2 and 3 (the primeblocksizes below)
-    primeBlockSize = [2, 3]
-    type = "Prime"
-    for j in primeBlockSize
-        SavingOrbitsBase10.savingspecialorbitbase10(primeOrder, mVectorSize, j; type)
-        SavingOrbitsPowerOf2.savingspecialorbitpowerof2(primeOrder, mVectorSize, j; type)
     end
 end
 

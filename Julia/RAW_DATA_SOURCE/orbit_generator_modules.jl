@@ -16,7 +16,7 @@ var = readdlm("RAW_DATA/INITIAL_CONDITIONS/variables_n_0_type_$(type)_MaxRand_$(
 var = Array(var)
 mVectorSize = var[1] #size of the m-vector
 MaxRand = var[2] #when type = "Random" this is the maximum value possible
-primeBlockSize = var[3] # when type = "Prime" this is the number of the first primes taken =#
+BlockSize = var[3] # when type = "Prime" this is the number of the first primes taken =#
 
 # this module has the CollatzMap function. It is used the accelerated collatz function
 module CollatzMap
@@ -33,8 +33,8 @@ module OrbitsBase10
     using DelimitedFiles
     using DataFrames
 
-    function orbitbase10(i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4;  type::String)
-        n₀ = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",BigInt, header = false)
+    function orbitbase10(i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4;  type::String)
+        n₀ = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",BigInt, header = false)
         iterateVariable = BigInt(n₀[1,1])
         orbit = BigInt[iterateVariable]
         while iterateVariable > 1
@@ -46,17 +46,6 @@ module OrbitsBase10
 
     function orbitbase10(x::BigInt)
         iterateVariable = x
-        orbit = BigInt[iterateVariable]
-        while iterateVariable > 1
-            iterateVariable = CollatzMap.collatz(iterateVariable)
-            push!(orbit, iterateVariable)
-        end
-        return(orbit)
-    end
-
-    function specialorbitbase10(i::Int64, primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
-        n₀ = readdlm("RAW_DATA/SPECIAL_INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv",BigInt, header = false)
-        iterateVariable = BigInt(n₀[1,1])
         orbit = BigInt[iterateVariable]
         while iterateVariable > 1
             iterateVariable = CollatzMap.collatz(iterateVariable)
@@ -77,24 +66,31 @@ module SavingOrbitsBase10
     using DataFrames
     using DelimitedFiles
 
-    function savingorbitbase10(mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
-        for i in 1:factorial(primeBlockSize)
-            println(i/factorial(primeBlockSize)*100) #time counter
-            orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, primeBlockSize; type)
-            writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit, header = false)
-        end
-    end
-
-    function savingspecialorbitbase10(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
-        primeblock = Int64[]
-        for i in 1:primeOrder
-            primeblock = vcat(primeblock, prime(i))
-        end
-        L = length(collect(combinations(primeblock,primeBlockSize)))
-        for i in 1:L
-            println(i/L*100) #time counter
-            orbit= OrbitsBase10.specialorbitbase10(i, primeOrder, mVectorSize, primeBlockSize; type)
-            writedlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv",orbit, header = false)
+    function savingorbitbase10(mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4; type::String)
+        if mVectorSize ≤ 360
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
+                for i in 1:factorial(BlockSize)
+                    println(i/factorial(BlockSize)*100) #time counter
+                    orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+                end
+            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
+                i = 1
+                orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
+                writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+            end
+        else
+            if type == "Random"
+                for i in 1:4
+                    #println(i/factorial(BlockSize)*100) #time counter
+                    orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+                end
+            else
+                i = 1
+                orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
+                writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+            end
         end
     end
 end
@@ -105,11 +101,23 @@ module OrbitPowersOf2
 
     include("initial_condition_modules.jl")
     import Main.AlgorithmsOfmVectors
+    import Main.CollatzMap
     using DelimitedFiles
 
-    function orbitpowerof2(i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
-        orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
+    function orbitpowerof2(i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4; type::String)
+        orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
         # this creates an array with "nothing" but that can receive matrices as elements
+        M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
+        j = 1
+        Threads.@threads for orbitVector in orbit
+            j += 1
+            mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbitVector)
+            M[j] = transpose(mVector) # the transpose is only to write every m-vector as a line of M
+        end
+        return(M)
+    end
+
+    function orbitpowerof2(orbit)
         M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
         for j in 1:length(orbit)
             mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbit[j])
@@ -118,15 +126,21 @@ module OrbitPowersOf2
         return(M)
     end
 
-    function specialorbitpowerof2(i::Int64, primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
-        orbit = readdlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
-        # this creates an array with "nothing" but that can receive matrices as elements
-        M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
-        for j in 1:length(orbit)
-            mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbit[j])
-            M[j] = transpose(mVector) # the transpose is only to write every m-vector as a line of M
+    function fastorbitpowerof2(m, orbit, BlockSize; type)
+        Ms = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
+        Ms[1] = Matrix(m)
+        for j in 2:length(orbit)
+            println("$(j/length(orbit)*100), BlockSize = $(BlockSize), type = $(type)")
+            if m[1] ≥ 1
+                m[1] = m[1] - 1
+                Ms[j] = Matrix(m)
+            end
+            if m[1] == 0
+                m = transpose(AlgorithmsOfmVectors.algorithm_m_vector(orbit[j]))
+                Ms[j] = Matrix(m)
+            end
         end
-        return(M)
+        return(Ms)
     end
 end
 
@@ -141,24 +155,42 @@ module SavingOrbitsPowerOf2
     using Primes
     using Combinatorics
 
-    function savingorbitpowerof2(mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4; type::String)
-        for i in 1:factorial(primeBlockSize)
-            println(i/factorial(primeBlockSize)*100)
-            M = OrbitPowersOf2.orbitpowerof2(i, mVectorSize, MaxRand, primeBlockSize; type)
-            writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M, header = false)
-        end
-    end
-
-    function savingspecialorbitpowerof2(primeOrder::Int64=5, mVectorSize::Int64=180, primeBlockSize::Int64=2;  type::String)
-        primeblock = Int64[]
-        for i in 1:primeOrder
-            primeblock = vcat(primeblock, prime(i))
-        end
-        L = length(collect(combinations(primeblock,primeBlockSize)))
-        for i in 1:L
-            println(i/L*100)
-            M = OrbitPowersOf2.specialorbitpowerof2(i, primeOrder, mVectorSize, primeBlockSize; type)
-            writedlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", M, header = false)
+    function savingorbitpowerof2(mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4; type::String)
+        if mVectorSize ≤ 360
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
+                for i in 1:factorial(BlockSize)
+                    println(i/factorial(BlockSize)*100)
+                    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
+                    m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                    m = transpose(m)
+                    M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+                end
+            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
+                i = 1
+                orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
+                m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                m = transpose(m)
+                M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
+                writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+            end
+        else
+            if type == "Random"
+                for i in 1:4
+                    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
+                    m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                    m = transpose(m)
+                    M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+                end
+            else
+                i = 1
+                orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
+                m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                m = transpose(m)
+                M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
+                writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+            end
         end
     end
 end

@@ -2,9 +2,6 @@ module VNEntropy
     using DelimitedFiles
     using StatsBase
     using LinearAlgebra
-    using Plots
-    using LaTeXStrings
-    using Plots.PlotMeasures
 
     function corrmatrix(mSample)
         n = length(mSample[:,1])
@@ -31,7 +28,7 @@ module VNEntropy
         for i in 1:N
            S = S - λ[i]*log(λ[i])
         end
-        return(S)
+        return(S/log(N))
     end
 end #VNEntropy module
 
@@ -40,56 +37,60 @@ module VNEntropyEvaluation
     using DelimitedFiles
     using StatsBase
     using LinearAlgebra
-    using Plots
-    using LaTeXStrings
-    using Plots.PlotMeasures
 
-    #=function random_evolution_S()
-        m = readdlm("RAW_DATA/ORBITS/orbit_n_0_5_Random_mVectorSize_180_MaxRand_10_primeBlockSize_4_power_of_2.csv", header = false)
-        m = Int64.(replace(m, "" => -1))
-        ts = 1000:25:length(m[:,1])
-        plt1 = plot(dpi = 200)
-        plt2 = plot(dpi = 200)
-        anim = @animate for i in ts
-                println(i/length(m[:,1]))
-                mSample = m[1:i,1:100]
-                R = VNEntropy.corrmatrix(mSample)
-                S = VNEntropy.vnentropy(R)
-                #entropias = vcat(entropias, S)
-                heatmap!(plt1,R, title = "Entropy = $(Float16(S)), Time series length = $(1000+i)")
-                scatter!(plt2, [i],[S], label = false, mc = :blue, ms = 1.5, markerstrokewidth = 0, xrange = (1000,length(m[:,1])), yrange = (4.2, log(100)))
-                plt3 = plot(plt1, plt2, layout = (2,1))
-        end
-        gif(anim, string(pasta,"/random_evolution_S.gif"), fps = 10)
-    end=#
-
-    function variatingTimeSeries(m, L, percent)
+    function variatingTimeSeries(m, L, mVectorSize::Int64=100, BlockSize::Int64=4; type::String, i)
         T = length(m[:,1])
-        ts = round(Int64, 4*T/10):200:T
-        data = reshape([],0,2)
-        for i in ts
-            println([i/length(m[:,1]) percent])
-            mSample = m[1:i,1:L]
+        ts = round(Int64, 5*T/10):round(Int64, 5*T/100):T
+        VnS = reshape([],0,2)
+        for j in ts
+            mSample = m[1:j,:]
+            println("$(j/T*100) %, mVectorSize = $(mVectorSize), BlockSize = $(BlockSize), type $(type), i = $(i)")
             S = VNEntropy.vnentropy(VNEntropy.corrmatrix(mSample))
-            arr = [i/T S]
-            data = vcat(data, arr)
+            data = [j/T S]
+            VnS = vcat(VnS, data)
         end
-        return(data)
+        return(VnS)
     end
 
-    function savingVariatingTimeSeries(percent, i::Int64, mVectorSize::Int64=100,MaxRand::Int64=10, primeBlockSize::Int64=4;  type::String)
-        m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", header = false)
-        m = Int64.(replace(m, "" => -1))
-        L = 100
-        data = variatingTimeSeries(m, L, percent)
-        writedlm("DATA/VON_NEUMANN_ENTROPY/variating_time_series_entropy_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", data, header = false)
-    end
-
-    function savingVariatingTimeSeries(percent, i::Int64, mVectorSize::Int64=100, primeBlockSize::Int64=4)
-        m = readdlm("RAW_DATA/SPECIAL_ORBITS/orbit_n_0_$(i)_Prime_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize)_power_of_2.csv", header = false)
-        m = Int64.(replace(m, "" => -1))
-        L = 100
-        data = variatingTimeSeries(m, L, percent)
-        writedlm("DATA/VON_NEUMANN_ENTROPY/variating_time_series_entropy_n_0_$(i)_Prime_mVectorSize_$(mVectorSize)_primeBlockSize_$(primeBlockSize).csv", data, header = false)
+    function savingVariatingTimeSeries(mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4;  type::String)
+        if mVectorSize ≤ 360
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
+                for i in 1:factorial(BlockSize)
+                    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                    L = 100
+                    m = m[:,1:L]
+                    m = Int64.(replace(m, "" => -1))
+                    data = variatingTimeSeries(m, L, mVectorSize, BlockSize; type, i)
+                    writedlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", data, header = false)
+                end
+            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
+                i = 1
+                m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                L = 100
+                m = m[:,1:L]
+                m = Int64.(replace(m, "" => -1))
+                data = variatingTimeSeries(m, L, mVectorSize, BlockSize; type, i)
+                writedlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", data, header = false)
+            end
+        else
+            if type == "Random"
+                for i in 1:4
+                    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                    L = 100
+                    m = m[:,1:L]
+                    m = Int64.(replace(m, "" => -1))
+                    data = variatingTimeSeries(m, L, mVectorSize, BlockSize; type, i)
+                    writedlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", data, header = false)
+                end
+            else
+                i = 1
+                m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                L = 100
+                m = m[:,1:L]
+                m = Int64.(replace(m, "" => -1))
+                data = variatingTimeSeries(m, L, mVectorSize, BlockSize; type, i)
+                writedlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", data, header = false)
+            end
+        end
     end
 end

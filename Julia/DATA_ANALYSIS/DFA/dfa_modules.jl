@@ -49,24 +49,49 @@ module DFA
         return(Δns, fluctuations)
     end
 
-    function savingdfa(i,
-                        mVectorSize::Int64=100,
+    function savingdfa(mVectorSize::Int64=100,
                         MaxRand::Int64=10,
-                        primeBlockSize::Int64=4;
+                        BlockSize::Int64=4;
                         type::String)
-        stationaryOrbit = readdlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", header = false)
-        #=LogOrbit = log2.(Orbit)
-        N = length(LogOrbit)
-        differences = []
-        for j in 1:N-1
-            difference = LogOrbit[j+1]-LogOrbit[j]
-            differences = vcat(differences, difference)
-        end=#
-        data = dfa(stationaryOrbit, 1)
-        n = data[1]
-        detrendedFluctuation = data[2]
-        savingdata = hcat(n,detrendedFluctuation)
-        writedlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", savingdata)
+        if mVectorSize ≤ 360
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
+                for i in 1:factorial(BlockSize)
+                    stationaryOrbit = readdlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                    data = dfa(stationaryOrbit, 1)
+                    n = data[1]
+                    detrendedFluctuation = data[2]
+                    savingdata = hcat(n,detrendedFluctuation)
+                    writedlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", savingdata)
+                end
+            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
+                i = 1
+                stationaryOrbit = readdlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                data = dfa(stationaryOrbit, 1)
+                n = data[1]
+                detrendedFluctuation = data[2]
+                savingdata = hcat(n,detrendedFluctuation)
+                writedlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", savingdata)
+            end
+        else
+            if type == "Random"
+                for i in 1:4
+                    stationaryOrbit = readdlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                    data = dfa(stationaryOrbit, 1)
+                    n = data[1]
+                    detrendedFluctuation = data[2]
+                    savingdata = hcat(n,detrendedFluctuation)
+                    writedlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", savingdata)
+                end
+            else
+                i = 1
+                stationaryOrbit = readdlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                data = dfa(stationaryOrbit, 1)
+                n = data[1]
+                detrendedFluctuation = data[2]
+                savingdata = hcat(n,detrendedFluctuation)
+                writedlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", savingdata)
+            end
+        end
     end
 
     function fitdfa(n, dfa)
@@ -74,16 +99,45 @@ module DFA
         return(fit[1],fit[2])
     end
 
-    function savingfitdfa(i,
-                        mVectorSize::Int64=100,
+    function savingfitdfa(mVectorSize::Int64=100,
                         MaxRand::Int64=10,
-                        primeBlockSize::Int64=4;
+                        BlockSize::Int64=4;
                         type::String)
-        data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv")
-        n = data[:,1]
-        dfa = data[:,2]
-        fits = fitdfa(n,dfa, )
-        writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", fits)
+        if mVectorSize ≤ 360
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
+                for i in 1:factorial(BlockSize)
+                    data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
+                    n = data[:,1]
+                    dfa = data[:,2]
+                    fits = fitdfa(n,dfa)
+                    writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", fits)
+                end
+            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
+                i = 1
+                data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
+                n = data[:,1]
+                dfa = data[:,2]
+                fits = fitdfa(n,dfa)
+                writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", fits)
+            end
+        else
+            if type == "Random"
+                for i in 1:4
+                    data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
+                    n = data[:,1]
+                    dfa = data[:,2]
+                    fits = fitdfa(n,dfa)
+                    writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", fits)
+                end
+            else
+                i = 1
+                data = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
+                n = data[:,1]
+                dfa = data[:,2]
+                fits = fitdfa(n,dfa)
+                writedlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", fits)
+            end
+        end
     end
 
 end #module

@@ -12,13 +12,36 @@ using DelimitedFiles
         return(steps)
     end
 
-    function savingstepsstationary(i,
-                        mVectorSize::Int64=100,
+    function savingstepsstationary(mVectorSize::Int64=100,
                         MaxRand::Int64=10,
-                        primeBlockSize::Int64=4;
+                        BlockSize::Int64=4;
                         type::String)
-        stationary = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", header = false)
-        stepsOfStationary = stepsstationary(stationary)
-        writedlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", stepsOfStationary)
+        if mVectorSize ≤ 360
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
+                for i in 1:factorial(BlockSize)
+                    stationary = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                    stepsOfStationary = stepsstationary(stationary)
+                    writedlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", stepsOfStationary)
+                end
+            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
+                i = 1
+                stationary = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                stepsOfStationary = stepsstationary(stationary)
+                writedlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", stepsOfStationary)
+            end
+        else
+            if type == "Random"
+                for i in 1:4
+                    stationary = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                    stepsOfStationary = stepsstationary(stationary)
+                    writedlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", stepsOfStationary)
+                end
+            else
+                i = 1
+                stationary = readdlm("DATA/STATIONARY_ORBITS/stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+                stepsOfStationary = stepsstationary(stationary)
+                writedlm("DATA/STEP_STATIONARY/step_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", stepsOfStationary)
+            end
+        end
     end
 end
