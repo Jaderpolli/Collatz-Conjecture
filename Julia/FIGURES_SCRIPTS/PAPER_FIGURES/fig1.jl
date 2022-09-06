@@ -4,14 +4,16 @@ mkpath(pasta)
 
 function figMrandom()
     palette = [
-        colorant"firebrick",
-        colorant"royalblue4",
+        colorant"blue",
+        colorant"red",
         colorant"gold1",
-        colorant"indianred2",
-        colorant"steelblue1",
-        colorant"lemonchiffon1",
+        colorant"darkblue",
+        colorant"red3",
+        colorant"gold",
+        colorant"skyblue",
+        colorant"tomato",
+        colorant"lightblue1",
         colorant"lightsalmon",
-        colorant"lightblue1"
     ]
     m = readdlm("RAW_DATA/ORBITS/orbit_n_0_22_Random_mVectorSize_180_MaxRand_10_BlockSize_5_power_of_2.csv", header = false)
     m = Int64.(replace(m, "" => -1))
@@ -24,20 +26,22 @@ function figMrandom()
                 xlabel = L"t",
                 ylabel =  L"m_i",
                 c = cgrad(:cs, categorical = true),
-                size = (400,150), dpi = 500)
+                size = (400,300), dpi = 500)
     savefig(plt, string(pasta,"/M_Matrix_n_0_22_Random_mVectorSize_180_MaxRand_10_BlockSize_5.pdf"))
 end
 
 function figMoscilatory()
     palette = [
-        colorant"firebrick",
-        colorant"royalblue4",
+        colorant"blue",
+        colorant"red",
         colorant"gold1",
-        colorant"indianred2",
-        colorant"steelblue1",
-        colorant"lemonchiffon1",
+        colorant"darkblue",
+        colorant"red3",
+        colorant"gold",
+        colorant"skyblue",
+        colorant"tomato",
+        colorant"lightblue1",
         colorant"lightsalmon",
-        colorant"lightblue1"
     ]
     m = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
     m = Int64.(replace(m, "" => -1))
@@ -50,7 +54,7 @@ function figMoscilatory()
                 xlabel = L"t",
                 ylabel =  L"m_i",
                 c = cgrad(:cs, categorical = true),
-                size = (400,150), dpi = 500)
+                size = (400,300), dpi = 500)
     savefig(plt, string(pasta,"/M_Matrix_n_0_1_Oscilatory_mVectorSize_2100_MaxRand_10_BlockSize_2.pdf"))
 end
 
@@ -102,14 +106,14 @@ function figModd()
                 xlabel = L"t",
                 ylabel =  L"m_i",
                 c = cgrad(:cs, categorical = true),
-                size = (400,150), dpi = 500)
+                size = (400,300), dpi = 500)
     savefig(plt, string(pasta,"/M_Matrix_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_2.pdf"))
 end
 
-# figMrandom()
-#figMoscilatory()
-#figMpascal()
-# figModd()
+figMrandom()
+figMoscilatory()
+# figMpascal()
+#figModd()
 
 lws = [1.5, 0.5]
 
@@ -217,7 +221,7 @@ function OrbitModd()
     savefig(plt, string(pasta,"/sum_M_orbit_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_2.pdf"))
 end
 
-OrbitMrandom()
-OrbitMoscilatory()
-OrbitMpascal()
-OrbitModd()
+# OrbitMrandom()
+# OrbitMoscilatory()
+# OrbitMpascal()
+# OrbitModd()
