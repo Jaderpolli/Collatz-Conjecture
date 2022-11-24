@@ -342,7 +342,7 @@ is = rand(1:factorial(blocksize),1)
 
 
 
- for i in is
+for i in is
     plotACFrand(i, blocksize)
     plotACFprime(i, blocksize)
     plotACFeven(i, blocksize)
