@@ -6,7 +6,7 @@ using Plots.PlotMeasures
 mkpath("FIGURES/fig3")
 
 function plotACFrand(i, blocksize)
-    acf_rand = readdlm("DATA/ACF/acf_n_0_$(i)_Random_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    acf_rand = readdlm("DATA/ACF/ACF_Random/acf_n_0_$(i)_Random_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("rand")
 
     iid_high_corr_rand = iid_highCorrelations(acf_rand, "rand")
@@ -54,7 +54,7 @@ end
 
 function plotACFprime(i, blocksize)
 
-    acf_prime = readdlm("DATA/ACF/acf_n_0_$(i)_Prime_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    acf_prime = readdlm("DATA/ACF/ACF_Prime/acf_n_0_$(i)_Prime_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("prime")
 
     iid_high_corr_prime = iid_highCorrelations(acf_prime, "prime")
@@ -103,7 +103,7 @@ end
 
 function plotACFeven(i, blocksize)
 
-    acf_even = readdlm("DATA/ACF/acf_n_0_$(i)_Even_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    acf_even = readdlm("DATA/ACF/ACF_Even/acf_n_0_$(i)_Even_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("even")
     iid_high_corr_even = iid_highCorrelations(acf_even, "even")
     writedlm("FIGURES/fig3/iid_high_corr_even_$(i)_blocksize_$(blocksize).csv", iid_high_corr_even)
@@ -151,7 +151,7 @@ end
 
 function plotACFodd(i, blocksize)
 
-    acf_odd = readdlm("DATA/ACF/acf_n_0_$(i)_Odd_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    acf_odd = readdlm("DATA/ACF/ACF_Odd/acf_n_0_$(i)_Odd_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("odd")
     iid_high_corr_odd = iid_highCorrelations(acf_odd, "odd")
     writedlm("FIGURES/fig3/iid_high_corr_odd_$(i)_blocksize_$(blocksize).csv", iid_high_corr_odd)
@@ -199,7 +199,7 @@ end
 
 function plotACFoscilatory(i, blocksize)
 
-    acf_oscilatory = readdlm("DATA/ACF/acf_n_0_$(i)_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    acf_oscilatory = readdlm("DATA/ACF/ACF_Oscilatory/acf_n_0_$(i)_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("oscilatory")
     iid_high_corr_oscilatory = iid_highCorrelations(acf_oscilatory, "oscilatory")
     writedlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_blocksize_$(blocksize).csv", iid_high_corr_oscilatory)
@@ -247,7 +247,7 @@ end
 
 function plotACFpascal(i, blocksize)
 
-    acf_pascal = readdlm("DATA/ACF/acf_n_0_$(i)_Pascal_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    acf_pascal = readdlm("DATA/ACF/ACF_Pascal/acf_n_0_$(i)_Pascal_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("pascal")
     iid_high_corr_pascal = iid_highCorrelations(acf_pascal, "pascal")
     writedlm("FIGURES/fig3/iid_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", iid_high_corr_pascal)
@@ -337,15 +337,19 @@ function iid_highCorrelations(x, type)
     return(high_corr)
 end
 
-is = rand(1:factorial(5),10)
 blocksize = 3
+is = rand(1:factorial(blocksize),1)
 
 
-plotACFrand(i, blocksize)
-# for i in is
-#     plotACFprime(i, blocksize)
-#     plotACFeven(i, blocksize)
-#     plotACFodd(i, blocksize)
-# end
-# plotACFoscilatory(i, blocksize)
-# plotACFpascal(i, blocksize)
+
+ for i in is
+    plotACFrand(i, blocksize)
+    plotACFprime(i, blocksize)
+    plotACFeven(i, blocksize)
+    plotACFodd(i, blocksize)
+end
+
+i = 1 
+
+plotACFoscilatory(i, blocksize)
+plotACFpascal(i, blocksize)

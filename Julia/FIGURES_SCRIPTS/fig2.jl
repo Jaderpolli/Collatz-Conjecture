@@ -66,7 +66,7 @@ function ps_boxplots()
         a = @df data boxplot!([type], data[!,1], fillalpha  = 0.7, c = colors[j], label = false, linewidth = 2)
     end
 
-    savefig(a, string(pasta,"/ps_box_plot.pdf"))
+    savefig(a, string(pasta,"/2c.pdf"))
 end
 
 function DFA_boxplots()
@@ -94,7 +94,7 @@ function DFA_boxplots()
         a = @df data boxplot!([type], data[!,1], fillalpha  = 0.7, c = colors[j], label = false, linewidth = 2)
     end
 
-    savefig(a, string(pasta,"/DFA_box_plot.pdf"))
+    savefig(a, string(pasta,"/2d.pdf"))
 end
 
 function plot_ps()
@@ -134,7 +134,7 @@ function plot_ps()
     figure = plot!(linearpowerspectra[:,1], linearpowerspectra[:,2], linealpha = 0.3, lc = colors[7], label = false)
     figure = plot!(size = (400, 250), dpi = 500, left_margin = 5mm, bottom_margin = 1mm)
     figure = plot!(randpowerspectra[:,1], 0.3*randpowerspectra[:,1].^(0), ls = :dash, lc = :black, label = L"c \propto f^{0}")
-    savefig(figure, string(pasta, "/power_spectra_plot.pdf"))
+    savefig(figure, string(pasta, "/1a.pdf"))
 end
 
 function plot_dfa()
@@ -174,10 +174,8 @@ function plot_dfa()
     figure = plot!(lineardfa[:,1], lineardfa[:,2], linealpha = 0.4, lc = colors[7],  ms = 1.5, marker = (colors[7], stroke(0)),  markeralpha = 0.4,label = "Linear")
     figure = plot!(size = (400, 250), dpi = 500, left_margin = 5mm, bottom_margin = 1mm)
     figure = plot!(oscilatorydfa[:,1], 0.2*oscilatorydfa[:,1].^(1/2), ls = :dash, lc = :black, label = L"n^{1/2}")
-    savefig(figure, string(pasta, "/dfa_plot.pdf"))
+    savefig(figure, string(pasta, "/1b.pdf"))
 end
-
-
 
 ps_boxplots()
 DFA_boxplots()

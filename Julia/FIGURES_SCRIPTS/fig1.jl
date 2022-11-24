@@ -8,6 +8,32 @@ using Plots.PlotMeasures
 pasta = "FIGURES/fig1"
 mkpath(pasta)
 
+lws = [1.5, 0.5]
+
+function OrbitMrandom()
+    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
+    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_base10.csv", header = false)
+    m = Int64.(replace(m, "" => 0))
+    orbit_m_sum = zeros(length(m[:,1]))
+    for i in eachindex(m[:,1])
+        orbit_m_sum[i] = sum(m[i,:])
+    end
+    logorbit = log2.(orbit)
+    plt = plot(fontfamily = "Computer Modern", fg_legend = :false)
+    plt = plot!(orbit_m_sum,
+                size = (325,125),
+                lw = lws[1],
+                lc = RGB(0.2, 0.33, 0.5),
+                xlabel = L"t",
+                ylabel = L"\log_2 [n_t]",
+                frame = :box,
+                legend = :topright,
+                label = L"\sum m_i(t)",
+                dpi = 500)
+    plt = plot!(logorbit, label = L"\log_2 [n_t]", lc = :red, lw = lws[2], linealpha = 0.7)
+    savefig(plt, string(pasta,"/1a.pdf"))
+end
+
 palette = [
     colorant"darkred",
     colorant"navyblue",
@@ -50,7 +76,7 @@ function figMrandom()
                 frame = :box,
                 c = cgrad(:cs, categorical = true),
                 size = (325,125), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2.pdf"))
+    savefig(plt, string(pasta,"/1b.pdf"))
 end
 
 function figMrandomzoom1()
@@ -73,7 +99,7 @@ function figMrandomzoom1()
                 bottom_margin = -2mm,
                 c = cgrad(:cs, categorical = true),
                 size =  (160,150), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_zoom1.pdf"))
+    savefig(plt, string(pasta,"/1c.pdf"))
 end
 
 function figMrandomzoom2()
@@ -96,7 +122,7 @@ function figMrandomzoom2()
                 bottom_margin = -2mm,
                 c = cgrad(:cs, categorical = true),
                 size =  (160,150), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_zoom2.pdf"))
+    savefig(plt, string(pasta,"/1d.pdf"))
 end
 
 function figMrandomzoom3()
@@ -119,7 +145,7 @@ function figMrandomzoom3()
                 left_margin = -2mm,
                 bottom_margin = -2mm,
                 size =  (160,150), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_zoom3.pdf"))
+    savefig(plt, string(pasta,"/1e.pdf"))
 end
 
 function figMrandomzoom4()
@@ -142,39 +168,13 @@ function figMrandomzoom4()
                 bottom_margin = -2mm,
                 c = cgrad(:cs, categorical = true),
                 size =  (160,150), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_zoom4.pdf"))
+    savefig(plt, string(pasta,"/1f.pdf"))
 end
 
+OrbitMrandom()
 figMrandom()
 figMrandomzoom1()
 figMrandomzoom2()
 figMrandomzoom3()
 figMrandomzoom4()
 
-lws = [1.5, 0.5]
-
-function OrbitMrandom()
-    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2_base10.csv", header = false)
-    m = Int64.(replace(m, "" => 0))
-    orbit_m_sum = zeros(length(m[:,1]))
-    for i in eachindex(m[:,1])
-        orbit_m_sum[i] = sum(m[i,:])
-    end
-    logorbit = log2.(orbit)
-    plt = plot(fontfamily = "Computer Modern", fg_legend = :false)
-    plt = plot!(orbit_m_sum,
-                size = (325,125),
-                lw = lws[1],
-                lc = RGB(0.2, 0.33, 0.5),
-                xlabel = L"t",
-                ylabel = L"\log_2 [n_t]",
-                frame = :box,
-                legend = :topright,
-                label = L"\sum m_i(t)",
-                dpi = 500)
-    plt = plot!(logorbit, label = L"\log_2 [n_t]", lc = :red, lw = lws[2], linealpha = 0.7)
-    savefig(plt, string(pasta,"/sum_M_orbit_n_0_2_Random_mVectorSize_180_MaxRand_10_BlockSize_2.pdf"))
-end
-
-OrbitMrandom()
