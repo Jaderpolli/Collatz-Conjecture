@@ -16,7 +16,7 @@ function histograms()
 
     topPlots  = plot(layout = (1,2), top_margin = 5mm)
 
-    for i in 1:length(types)
+    for i in eachindex(types)
         type = types[i]
         gamma2 = []
         for j in 2:maximumPrimeBlockSize
@@ -56,7 +56,7 @@ function histograms()
     types = ["Random", "Prime"]
     gamma2 = []
 
-    for i in 1:length(types)
+    for i in eachindex(types)
             type = types[i]
             for j in 2:maximumPrimeBlockSize
                 primeBlockSize = j

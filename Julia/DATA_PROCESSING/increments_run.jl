@@ -7,30 +7,40 @@ function increments()
     mkpath("DATA/INCREMENTS")
 
 
-    mVectorSizes = [180, 2100]
+    mVectorSizes = [180#=, 2100=#]
     MaxRand = 10
     maximumBlockSize =  5
-    types = ["Random", "Prime", "Even", "Odd", "Pascal Triangle", "Oscilatory", "Linear"]
+    types = [#="Random", "Prime", "Even", "Odd",=# "Pascal", "Oscilatory", "Linear"]
 
-    Threads.@threads for mVectorSize in mVectorSizes
-        i = 0
-        Threads.@threads for type in types
-            i += 1
-            if type == "Linear"
-                mVectorSize = 180
-                BlockSizes = [30, 60, 180]
-                for BlockSize in BlockSizes
-                    println("Linear, BlockSize = $(BlockSize)")
-                    SavingIncrements.savingLogarithmcIncrements(mVectorSize, MaxRand, BlockSize; type)
-                end
-            else
+    i = 0
+    Threads.@threads for type in types
+        i += 1
+        if type == "Linear"
+            BlockSizes = range(3,60, step = 1)
+            logsum = 2000
+            for BlockSize in BlockSizes
+                epsilon = BlockSize*(BlockSize+1)/2
+                mVectorSize = round(Int, logsum*BlockSize/epsilon)
+                SavingIncrements.savingLogarithmcIncrements(mVectorSize, MaxRand, BlockSize; type)
+            end
+        elseif type == "Pascal"
+            mVectorSize = 180
+            BlockSizes = range(2, 6, step = 1)
+            for BlockSize in BlockSizes
+                SavingIncrements.savingLogarithmcIncrements(mVectorSize, MaxRand, BlockSize; type)
+            end
+        elseif type == "Oscilatory"
+            logsum = 3000
+            BlockSizes = range(2, 100, step = 2)
+            for BlockSize in BlockSizes
+                epsilon = round(Int,BlockSize^2/4+BlockSize)
+                mVectorSize = round(Int, logsum*BlockSize/epsilon)
+                SavingIncrements.savingLogarithmcIncrements(mVectorSize, MaxRand, BlockSize; type)
+            end
+        else
+            for mVectorSize in mVectorSizes
                 for j in 2:maximumBlockSize
                     BlockSize = j
-                    percent = 100*(1/((maximumBlockSize-1)*(length(types))) +(j-2)/((maximumBlockSize-1)*(length(types)))+(i-1)/length(types))
-                    println(
-                    "Increments $(percent),
-                    type = $(type), mVectorSize = $(mVectorSize)"
-                    )
                     SavingIncrements.savingLogarithmcIncrements(mVectorSize, MaxRand, BlockSize; type)
                 end
             end

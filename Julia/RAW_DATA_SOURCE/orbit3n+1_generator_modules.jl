@@ -76,7 +76,7 @@ module OrbitPowersOf2
         orbit = readdlm("RAW_DATA/ORBITS_3n+1/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize)_base10.csv", BigInt, header = false)
         # this creates an array with "nothing" but that can receive matrices as elements
         M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
-        for j in 1:length(orbit)
+        for j in eachindex(orbit)
             mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbit[j])
             M[j] = transpose(mVector) # the transpose is only to write every m-vector as a line of M
         end

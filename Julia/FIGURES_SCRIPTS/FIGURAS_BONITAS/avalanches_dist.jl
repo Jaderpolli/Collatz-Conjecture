@@ -4,7 +4,7 @@ using StatsBase
 using Plots.PlotMeasures
 using LaTeXStrings
 
-pasta = "FIGURES/AVALANCHES_FIGURES"
+pasta = "Julia/FIGURES_SCRIPTS/FIGURAS_BONITAS"
 mkpath(pasta)
 
 function main()
@@ -43,7 +43,7 @@ function main()
         dpi = 500,
         left_margin = 10mm
         )
-    png(plotfinal, string(pasta, "/avalanche_disances"))
+    savefig(plotfinal, string(pasta, "/avalanche_disances.pdf"))
 end
 
 main()

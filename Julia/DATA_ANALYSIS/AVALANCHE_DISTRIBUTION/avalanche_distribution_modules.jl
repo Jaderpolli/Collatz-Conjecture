@@ -4,7 +4,7 @@ module AvalanchesDistributions
 
     function avalanchesizes(m1)
         m1Values = []
-        for j in 1:length(m1)-1
+        for j in eachindex(m1)-1
             if m1[j] == 0 && m1[j+1] > 0
                 m1Values = vcat(m1Values,m1[j+1])
             else
@@ -54,7 +54,7 @@ module AvalanchesDistributions
         else
             x = range(1,length(distribution))
         end
-        fit = linear_fit(x, log2.(distribution ./ normalizer)[1:length(x)])
+        fit = linear_fit(x, log2.(distribution ./ normalizer)[eachindex(x)])
         writedlm("DATA/AVALANCHES_FIT/fit_avalanche_distribution_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).csv", fit, header = false)
     end
 end
@@ -68,7 +68,7 @@ module AvalanchesDistance
     function distanceAvalanches(m1)
         m1Values = reshape([],0,2)
         i = 1
-        for j in 1:length(m1)-1
+        for j in eachindex(m1)-1
             if m1[j] == 0 && m1[j+1] > 0
                 pair = [m1[j+1] j+1-i]
                 m1Values = vcat(m1Values,pair)
@@ -82,7 +82,7 @@ module AvalanchesDistance
             indexs = findall(isequal(i), m1Values[:,1])
             (isequal(length(indexs),0) || isequal(length(indexs),1)) && continue
             distances = []
-            for j in 1:length(indexs)-1
+            for j in eachindex(indexs)-1
                 d = sum(m1Values[indexs[j]:indexs[j+1]])
                 distances = vcat(distances, d)
             end

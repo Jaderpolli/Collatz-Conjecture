@@ -14,7 +14,7 @@ maximumPrimeBlockSize =  6 # with this variable, we create 1!+2!+3!+4!+5!+6!=873
 types = ["Random", "Prime"]
 
 import Main.SavingOrbitsBase10
-for i in 1:length(types)
+for i in eachindex(types)
     type = types[i]
     for j in 2:maximumPrimeBlockSize
         primeBlockSize = j
@@ -23,7 +23,7 @@ for i in 1:length(types)
 end
 
 import Main.SavingOrbitsPowerOf2
-for i in 1:length(types)
+for i in eachindex(types)
     type = types[i]
     for j in 2:maximumPrimeBlockSize
         primeBlockSize = j

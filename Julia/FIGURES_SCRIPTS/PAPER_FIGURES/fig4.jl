@@ -1,212 +1,202 @@
-# ler vetor m Random, Prime, Even, Odd, Oscilatory, Pascal Triangle
-# calcular matriz de correlação e salvar e plotar
-# ler entropia e plotar o máximo de cada em função de t/T
+using Plots
+using DelimitedFiles
+using StatsBase
+using LaTeXStrings, ColorSchemes,  Colors, ColorSchemeTools
+using Plots.PlotMeasures
 
-include("D:/WINDOWS/Usuario/Documents/Collatz_map/Julia/DATA_ANALYSIS/VON_NEUMANN_ENTROPY/von_neumann_entropy_modules.jl")
-import.Main.VNEntropy
-
-using Plots, Plots.PlotMeasures, DelimitedFiles, ColorSchemes, LaTeXStrings, Colors, ColorSchemeTools
-using CSV, StatsPlots, DataFrames
 pasta = "FIGURES/fig4"
 mkpath(pasta)
 
-function plot_corr()
+palette = [
+    colorant"darkred",
+    colorant"navyblue",
+    colorant"yellow",
+    colorant"magenta",
+    colorant"cyan",
+    colorant"green1",
+    colorant"red",
+    colorant"blue",
+    colorant"gold",
+    colorant"deeppink",
+    colorant"darkcyan",
+    colorant"green2",
+    colorant"firebrick4",
+    colorant"midnightblue",
+    colorant"lawngreen",
+    colorant"hotpink",
+    colorant"paleturquoise2",
+    colorant"yellow3",
+    colorant"tomato",
+    colorant"royalblue1",
+    colorant"greenyellow",
+    colorant"pink2",
+    colorant"paleturquoise1",
+    colorant"goldenrod2",
+    colorant"salmon",
+    colorant"royalblue3",
+    colorant"olivedrab1"
+]
 
-    L = 100
-
-    mRand = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Random_mVectorSize_2100_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    mRand = mRand[:,1:L]
-    mRand = Int64.(replace(mRand, "" => -1))
-    S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_1_Random_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header = false)
-    maxS = maximum(S[:,2])
-    t = findall(isequal(maxS), S[:,2])
-    t = round(Int64, length(mRand[:,1])*S[t[1],1])
-    mSample = mRand[1:t,:]
-    corrMatrixRand = VNEntropy.corrmatrix(mSample)
-    fig = plot(fontfamily = "Computer Modern", size = (220,200), dpi = 500, xlabel = L"j", ylabel = L"i")
-    fig = heatmap!(abs.(transpose(corrMatrixRand)), c= cgrad(:afmhot, scale = :linear))
-    savefig(fig, string(pasta, "/corrMatrixRand.pdf"))
-
-    mPrime = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Prime_mVectorSize_2100_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    mPrime = mPrime[:,1:L]
-    mPrime = Int64.(replace(mPrime, "" => -1))
-    S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_1_Prime_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header = false)
-    maxS = maximum(S[:,2])
-    t = findall(isequal(maxS), S[:,2])
-    t = round(Int64, length(mPrime[:,1])*S[t[1],1])
-    mSample = mPrime[1:t,:]
-    corrMatrixPrime = VNEntropy.corrmatrix(mSample)
-    fig = plot(fontfamily = "Computer Modern", size = (220,200), dpi = 500, xlabel = L"j", ylabel = L"i")
-    fig = heatmap!(abs.(transpose(corrMatrixPrime)), c= cgrad(:afmhot, scale = :linear))
-    savefig(fig, string(pasta, "/corrMatrixPrime.pdf"))
-
-    mEven = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Even_mVectorSize_2100_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    mEven = mEven[:,1:L]
-    mEven = Int64.(replace(mEven, "" => -1))
-    S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_1_Even_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header = false)
-    maxS = maximum(S[:,2])
-    t = findall(isequal(maxS), S[:,2])
-    t = round(Int64, length(mEven[:,1])*S[t[1],1])
-    mSample = mEven[1:t,:]
-    corrMatrixEven = VNEntropy.corrmatrix(mSample)
-    fig = plot(fontfamily = "Computer Modern", size = (220,200), dpi = 500, xlabel = L"j", ylabel = L"i")
-    fig = heatmap!(abs.(transpose(corrMatrixEven)), c = cgrad(:afmhot, scale = :linear))
-    savefig(fig, string(pasta, "/corrMatrixEven.pdf"))
-
-    mOdd = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Odd_mVectorSize_2100_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    mOdd = mOdd[:,1:L]
-    mOdd = Int64.(replace(mOdd, "" => -1))
-    S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_1_Odd_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header = false)
-    maxS = maximum(S[:,2])
-    t = findall(isequal(maxS), S[:,2])
-    t = round(Int64, length(mOdd[:,1])*S[t[1],1])
-    mSample = mOdd[1:t,:]
-    corrMatrixOdd = VNEntropy.corrmatrix(mSample)
-    fig = plot(fontfamily = "Computer Modern", size = (220,200), dpi = 500, xlabel = L"j", ylabel = L"i")
-    fig = heatmap!(abs.(transpose(corrMatrixOdd)), c = cgrad(:afmhot, scale = :linear))
-    savefig(fig, string(pasta, "/corrMatrixOdd.pdf"))
-
-    mOscilatory = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Oscilatory_mVectorSize_2100_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    mOscilatory = mOscilatory[:,1:L]
-    mOscilatory = Int64.(replace(mOscilatory, "" => -1))
-    S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_1_Oscilatory_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header = false)
-    maxS = maximum(S[:,2])
-    t = findall(isequal(maxS), S[:,2])
-    t = round(Int64, length(mOscilatory[:,1])*S[t[1],1])
-    mSample = mOscilatory[1:t,:]
-    corrMatrixOscilatory = VNEntropy.corrmatrix(mSample)
-    fig = plot(fontfamily = "Computer Modern", size = (220,200), dpi = 500, xlabel = L"j", ylabel = L"i")
-    fig = heatmap!(abs.(transpose(corrMatrixOscilatory)), c = cgrad(:afmhot, scale = :linear))
-    savefig(fig, string(pasta, "/corrMatrixOscilatory.pdf"))
-
-    mPascal = readdlm("RAW_DATA/ORBITS/orbit_n_0_1_Pascal Triangle_mVectorSize_2100_MaxRand_10_BlockSize_2_power_of_2.csv", header = false)
-    mPascal = mPascal[:,1:L]
-    mPascal = Int64.(replace(mPascal, "" => -1))
-    S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_1_Pascal Triangle_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header = false)
-    maxS = maximum(S[:,2])
-    t = findall(isequal(maxS), S[:,2])
-    t = round(Int64, length(mPascal[:,1])*S[t[1],1])
-    mSample = mPascal[1:t,:]
-    corrMatrixPascal = VNEntropy.corrmatrix(mSample)
-    fig = plot(fontfamily = "Computer Modern", size = (220,200), dpi = 500, xlabel = L"j", ylabel = L"i")
-    fig = heatmap!(abs.(transpose(corrMatrixPascal)), c = cgrad(:afmhot, scale = :linear))
-    savefig(fig, string(pasta, "/corrMatrixPascal.pdf"))
+function PlotOrbit(i, mVectorSize, blocksize, type)
+    println("plotorbit, $(type), $(mVectorSize), $(blocksize)")
+    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_base10.csv", BigFloat, header = false)
+    logorbit = log2.(orbit)
+    plt = plot(fontfamily = "Computer Modern", fg_legend = :false)
+    plt = plot!(logorbit,
+                size = (415,150),
+                lc = :black,
+                xlabel = L"t",
+                ylabel = L"\log_2 [f^t(n_0)]",
+                #xrange = (1,5500),
+                #xticks = [1000, 2000, 3000, 4000, 5000],
+                frame = :box,
+                #left_margin = 3mm,
+                bottom_margin = 5mm,
+                legend = :bottomleft,
+                label = false,
+                dpi = 500)
+    savefig(plt, string(pasta,"/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize).pdf"))
 end
 
-function max_entropy()
-    mVectorSizes = [180, 2100]
-    MaxRand = 10
-    maximumBlockSize =  5
-    types1 = ["Random", "Prime", "Odd"]
-    En = zeros(3, 156)
-    L = 0
-
-    for type in types1
-        L +=1
-        maxEn = []
-        for mVectorSize in mVectorSizes
-            if mVectorSize < 360
-                for j in 2:maximumBlockSize
-                    BlockSize = j
-                    for k in 1:factorial(BlockSize)
-                        S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        maxS = maximum(S[:,2])
-                        maxEn = vcat(maxEn, maxS)
-                    end
-                end
-            else
-                if type == "Random"
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                        S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        maxS = maximum(S[:,2])
-                        maxEn = vcat(maxEn, maxS)
-                    end
-                elseif type == "Even"
-                    for j in 2:maximumBlockSize-1
-                        BlockSize = j
-                        k = 1
-                        S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        maxS = maximum(S[:,2])
-                        maxEn = vcat(maxEn, maxS)
-                    end
-                else
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                        S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        maxS = maximum(S[:,2])
-                        maxEn = vcat(maxEn, maxS)
-                    end
-                end
-            end
-        end
-        En[L,:] = maxEn
-    end
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    data= DataFrame(transpose(En), types1)
-    a = plot(size = (250,350), fontfamily = "Computer Modern",
-        xlabel = "type",
-        ylabel =  L"\beta", dpi = 500)
-    a = @df data violin!(["Random"], :Random, fillcolor = colors[1], label = false)
-    a = @df data boxplot!(["Random"], :Random, fillalpha  = 0.7, c = colors[1], label = false, linewidth = 2)
-    a =@df data violin!(["Prime"], :Prime, fillcolor = colors[2], label = false)
-    a =@df data boxplot!(["Prime"], :Prime, fillalpha  = 0.7, c = colors[2], label = false, linewidth = 2)
-    # a =@df data dotplot!(["Even"], :Even, marker = (colors[3], stroke(0)), label = false)
-    # a =@df data boxplot!(["Even"], :Even, fillalpha  = 0.7, c = colors[3], label = false, linewidth = 2)
-    a =@df data violin!(["Odd"], :Odd, fillcolor = colors[4], label = false)
-    a =@df data boxplot!(["Odd"], :Odd, fillalpha  = 0.7, c = colors[4], label = false, linewidth = 2)
-    #
-
-        types3 = ["Even"]
-        En = zeros(1, 155)
-        L = 0
-        for type in types3
-            L +=1
-            maxEn = []
-            for mVectorSize in mVectorSizes
-                if mVectorSize < 360
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        for k in 1:factorial(BlockSize)
-                            S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                            maxS = maximum(S[:,2])
-                            maxEn = vcat(maxEn, maxS)
-                        end
-                    end
-                else
-                    if type == "Random"
-                        for j in 2:maximumBlockSize
-                            BlockSize = j
-                            k = 1
-                            S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                            maxS = maximum(S[:,2])
-                            maxEn = vcat(maxEn, maxS)
-                        end
-                    else
-                        for j in 2:4
-                            BlockSize = j
-                            k = 1
-                            S = readdlm("DATA/VON_NEUMANN_ENTROPY/vn_entropy_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                            maxS = maximum(S[:,2])
-                            maxEn = vcat(maxEn, maxS)
-                        end
-                    end
-                end
-            end
-            En[L,:] = maxEn[:]
-        end
-    data= DataFrame(transpose(En), ["Even"])
-    a = @df data violin!(["Even"], :Even, fillcolor = colors[3], label = false)
-    a = @df data boxplot!(["Even"], :Even, fillalpha  = 0.7, c = colors[3], label = false, linewidth = 2)
-
-    a = plot!(yrange = (0.9, 1), ylabel = L"S/S_{\mathrm{max}}")
-
-    savefig(a, string(pasta,"/maxEn_box_plot.pdf"))
+function zoom1plotOrbit(i, mVectorSize, blocksize, type)
+    println("zoom_plotorbit, $(type), $(mVectorSize), $(blocksize)")
+    orb_prime = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_base10.csv", BigFloat, header = false)
+    orb_prime = log2.(orb_prime)
+    inset_figure_orb = plot(orb_prime[1:250],
+                    fontfamily = "Computer Modern",
+                    size = (220,150),
+                    lc = :black,
+                    frame = :box,
+                    label = false,
+                    xlabel = L"t",
+                    #xticks = ([1:25:51;], [400, 425, 450]),
+                    #yrange = (minimum(orb_prime[1:2000]),maximum(orb_prime)+200),
+                    ylabel = L"\log_2 [f^t(n_0)]"
+                    )
+    savefig(inset_figure_orb, string(pasta,"/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom1.pdf"))
 end
 
-plot_corr()
-#max_entropy()
+function zoom2plotOrbit(i, mVectorSize, blocksize, type)
+    println("zoom_plotorbit, $(type), $(mVectorSize), $(blocksize)")
+    orb_prime = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_base10.csv", BigFloat, header = false)
+    orb_prime = log2.(orb_prime)
+    inset_figure_orb = plot(orb_prime[1:50],
+                    fontfamily = "Computer Modern",
+                    size = (220,150),
+                    lc = :black,
+                    frame = :box,
+                    label = false,
+                    xlabel = L"t",
+                    #xticks = ([1:25:51;], [400, 425, 450]),
+                    #yrange = (minimum(orb_prime[1:2000]),maximum(orb_prime)+200),
+                    ylabel = L"\log_2 [f^t(n_0)]"
+                    )
+    savefig(inset_figure_orb, string(pasta,"/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom2.pdf"))
+end
+
+function plotM(i, mVectorSize, blocksize, type)
+    println("plotM, $(type), $(mVectorSize), $(blocksize)")
+    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_power_of_2.csv", header = false)
+    m = Int64.(replace(m, "" => 0))
+    l = maximum(m)
+    pal = palette[1:l]
+    loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
+    lenx = length(m[:,1])
+    leny = length(m[1,:])
+    plt = heatmap(transpose(m[:,:]),
+                fontfamily = "Computer Modern",
+                xlabel = L"t",
+                ylabel =  L"m_i",
+                bottom_margin = 5mm,
+                #xticks = [2500, 5000, 7500, 10000, 12500],
+                frame = :box,
+                c = cgrad(:cs, categorical = true),
+                size = (450,150), dpi = 500)
+    savefig(plt, string(pasta,"/M_Matrix_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize).pdf"))
+end
+
+function zoom1plotM(i, mVectorSize, blocksize, type)
+    println("zoomplotM, $(type), $(mVectorSize), $(blocksize)")
+    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_power_of_2.csv", header = false)
+    m = Int64.(replace(m, "" => 0))
+    H = length(m[1,:])
+    # if H > 500
+    #     mi = m[1:500, 1:500]
+    # else
+    #     mi = m[1:H,1:H]
+    # end
+    mi = m[1:250,1:250]
+    l = maximum(mi)
+    pal = palette[1:l]
+    loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
+    plt = heatmap(transpose(mi),
+                fontfamily = "Computer Modern",
+                #xticks = ([1:25:51;], [400, 425, 450]),
+                #yticks = ([25:50:225;],["900","950", "1000", "1050", "1100"]),
+                xlabel = L"t",
+                ylabel =  L"m_i",
+                grid = true,
+                right_margin = 2mm,
+                frame = :box,
+                c = cgrad(:cs, categorical = true),
+                size = (250,150), dpi = 500)
+    savefig(plt, string(pasta,"/M_Matrix_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom1.pdf"))
+end
+
+function zoom2plotM(i, mVectorSize, blocksize, type)
+    println("zoomplotM, $(type), $(mVectorSize), $(blocksize)")
+    m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_power_of_2.csv", header = false)
+    m = Int64.(replace(m, "" => 0))
+    H = length(m[1,:])
+    # if H > 500
+    #     mi = m[1:500, 1:500]
+    # else
+    #     mi = m[1:H,1:H]
+    # end
+    mi = m[1:50,1:50]
+    l = maximum(mi)
+    pal = palette[1:l]
+    loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
+    plt = heatmap(transpose(mi),
+                fontfamily = "Computer Modern",
+                #xticks = ([1:25:51;], [400, 425, 450]),
+                #yticks = ([25:50:225;],["900","950", "1000", "1050", "1100"]),
+                xlabel = L"t",
+                ylabel =  L"m_i",
+                grid = true,
+                right_margin = 2mm,
+                frame = :box,
+                c = cgrad(:cs, categorical = true),
+                size = (250,150), dpi = 500)
+    savefig(plt, string(pasta,"/M_Matrix_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom2.pdf"))
+end
+
+# i = 1
+# mVectorSize = 180
+# blocksizes = [2, 5]
+# types = ["Prime","Even", "Odd", "Oscilatory", "Pascal"]
+#
+# for type in types
+#     for blocksize in blocksizes
+#         if type == "Even" && blocksize == 5
+#             continue
+#         else
+#             PlotOrbit(i, mVectorSize, blocksize, type)
+#             zoomplotOrbit(i, mVectorSize, blocksize, type)
+#             plotM(i, mVectorSize, blocksize, type)
+#             zoomplotM(i, mVectorSize, blocksize, type)
+#         end
+#     end
+# end
+
+i = 1
+mVectorSize = 180
+blocksize = 5
+type = "Prime"
+
+PlotOrbit(i, mVectorSize, blocksize, type)
+zoom1plotOrbit(i, mVectorSize, blocksize, type)
+zoom2plotOrbit(i, mVectorSize, blocksize, type)
+plotM(i, mVectorSize, blocksize, type)
+zoom1plotM(i, mVectorSize, blocksize, type)
+zoom2plotM(i, mVectorSize, blocksize, type)

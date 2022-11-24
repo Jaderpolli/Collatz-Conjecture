@@ -33,10 +33,10 @@ module AlgorithmsOfmVectors
 
     function rev_algorithm_m_vector(mVector)
         base10number = BigInt(0)
-        for i in 1:length(mVector)
+        for i in eachindex(mVector)
             base10number = BigInt(base10number)+BigInt(2)^(sum(mVector[1:i]))
         end
-        return(base10number)
+        return(BigInt(base10number))
     end
 end
 
@@ -88,7 +88,7 @@ module InitialConditionsGenerator
     # BlockSize will only be active when type is not "Random" and states the size of the building block
     # MaxRand will only be active when type = "Random"
     function initialcondition(mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4; type::String)
-        if mVectorSize ≤ 360
+        if mVectorSize ≤ 2000
             if type == "Prime"
                 primeblock = Int64[]
                 for i in 1:BlockSize
@@ -96,7 +96,7 @@ module InitialConditionsGenerator
                 end
                 allprimeblocks = collect(permutations(primeblock))
                 setOfn₀ = zeros(Int64, length(allprimeblocks), mVectorSize+1)
-                for i in 1:length(allprimeblocks)
+                for i in eachindex(allprimeblocks)
                     n₀ = hcat(0,transpose(allprimeblocks[i])) #the line-array of the i-th building block
                     for j in 2:round(Int,mVectorSize/BlockSize)
                         n₀ = hcat(n₀,transpose(allprimeblocks[i])) #concatenating the blocks
@@ -116,7 +116,7 @@ module InitialConditionsGenerator
                 end
                 allevenblocks = collect(permutations(evenblock))
                 setOfn₀ = zeros(Int64, length(allevenblocks), mVectorSize+1)
-                for i in 1:length(allevenblocks)
+                for i in eachindex(allevenblocks)
                     n₀ = hcat(0,transpose(allevenblocks[i])) #the line-array of the i-th building block
                     for j in 2:round(Int64,mVectorSize/BlockSize)
                         n₀ = hcat(n₀,transpose(allevenblocks[i])) #concatenating the blocks
@@ -130,41 +130,65 @@ module InitialConditionsGenerator
                 end
                 alloddblocks = collect(permutations(oddblock))
                 setOfn₀ = zeros(Int64, length(alloddblocks), mVectorSize+1)
-                for i in 1:length(alloddblocks)
+                for i in eachindex(alloddblocks)
                     n₀ = hcat(0,transpose(alloddblocks[i])) #the line-array of the i-th building block
                     for j in 2:round(Int,mVectorSize/BlockSize)
                         n₀ = hcat(n₀,transpose(alloddblocks[i])) #concatenating the blocks
                     end
                     setOfn₀[i,:] = n₀ #each line is one initial condition
                 end
-            elseif type == "Pascal Triangle"
+            elseif type == "Pascal"
                 pascalBlock = transpose(PascalTriangle.pascaltriangle(BlockSize))
-                n₀ = hcat(0, pascalBlock)
-                for j in 2:round(Int,mVectorSize/BlockSize)
-                    n₀ = hcat(n₀, pascalBlock)
+                allpascalblocks = unique(collect(permutations(pascalBlock)))
+                setOfn₀ = zeros(Int64, length(allpascalblocks), mVectorSize+1)
+                for i in eachindex(allpascalblocks)
+                    n₀ = hcat(0,transpose(allpascalblocks[i]))
+                    for j in 2:round(Int,mVectorSize/BlockSize)
+                        n₀ = hcat(n₀, transpose(allpascalblocks[i]))
+                    end
+                    setOfn₀[i,:] = n₀
                 end
-                setOfn₀ = n₀
             elseif type == "Oscilatory"
                 if BlockSize == 2
                     oscilatoryBlock = [1 2]
                 else
-                    oscilatoryBlock = hcat(transpose(Array(range(1,BlockSize))),transpose(Array(reverse(range(2, BlockSize-1)))))
+                    oscilatoryBlock = hcat(transpose(Array(range(1,round(Int,(BlockSize+2)/2), step = 1))),transpose(Array(reverse(range(2, round(Int,(BlockSize+2)/2)-1, step = 1)))))
                 end
                 n₀ = hcat(0,oscilatoryBlock)
                 for j in 2:round(Int,mVectorSize/BlockSize)
                     n₀ = hcat(n₀, oscilatoryBlock)
                 end
                 setOfn₀ = n₀
+                if BlockSize == 2
+                    oscilatoryBlock = [2 1]
+                else
+                    oscilatoryBlock = hcat(transpose(Array(reverse(range(1,round(Int,(BlockSize+2)/2), step = 1)))),transpose(Array(reverse(range(2, round(Int,(BlockSize+2)/2)-1, step = 1)))))
+                end
+                n₀ = hcat(0,oscilatoryBlock)
+                if length(n₀) > mVectorSize
+                    nothing
+                else
+                    for j in 2:round(Int,mVectorSize/BlockSize)
+                        n₀ = hcat(n₀, oscilatoryBlock)
+                    end
+                end
+                setOfn₀ = vcat(setOfn₀, n₀)
             elseif type == "Linear"
                 if BlockSize == mVectorSize
                     setOfn₀ = transpose(Array(range(0,mVectorSize)))
                 else
-                    linearBlock = transpose(Array(range(1,BlockSize)))
+                    linearBlock = transpose(Array(range(1,BlockSize, step = 1)))
                     n₀ = hcat(0, linearBlock)
                     for j in 2:round(Int, mVectorSize/BlockSize)
                         n₀ = hcat(n₀, linearBlock)
                     end
                     setOfn₀ = n₀
+                    revlinearBlock = reverse(linearBlock)
+                    n₀ = hcat(0, revlinearBlock)
+                    for j in 2:round(Int, mVectorSize/BlockSize)
+                        n₀ = hcat(n₀, revlinearBlock)
+                    end
+                    setOfn₀ = vcat(setOfn₀, n₀) 
                 end
             else
                 println("Input of InitialCondition function should be a type 'Random', 'Prime', 'Even', or 'Odd'") #error menssage
@@ -206,7 +230,7 @@ module InitialConditionsGenerator
                     n₀ = hcat(n₀,transpose(oddBlock)) #concatenating the blocks
                 end
                 setOfn₀ = n₀
-            elseif type == "Pascal Triangle"
+            elseif type == "Pascal"
                 pascalBlock = transpose(PascalTriangle.pascaltriangle(BlockSize))
                 n₀ = hcat(0, pascalBlock)
                 for j in 2:round(Int,mVectorSize/BlockSize)
@@ -235,9 +259,11 @@ end
 module SavingInitialConditions
     import Main.AlgorithmsOfmVectors
     import Main.InitialConditionsGenerator
+    import Main.PascalTriangle
     using CSV
     using DataFrames
     using DelimitedFiles
+    using Combinatorics
 
     #= to create the initial condition you should think if you want it to be constructed
     randomically or from structured periodic building blocks.
@@ -259,15 +285,12 @@ module SavingInitialConditions
 
         # this if condition exists to assure that the number of created initial conditions
         # is the same as expected by the factorial of BlockSize
-        if mVectorSize ≤ 360
-            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
-                for i in 1:length(setOfn₀[:,1])
+        if mVectorSize ≤ 2000
+            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd" || type == "Linear" || type == "Pascal" || type == "Oscilatory" 
+                for i in eachindex(setOfn₀[:,1])
                     fname = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv"
                     writedlm(fname, setOfn₀[i,:])
                 end
-            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
-                fname = "RAW_DATA/INITIAL_CONDITIONS/n_0_1_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv"
-                writedlm(fname, setOfn₀)
             end
         else
             if type == "Random"
@@ -283,7 +306,7 @@ module SavingInitialConditions
     end
 
     function saving_base10(mVectorSize::Int64=100, MaxRand::Int64=10, BlockSize::Int64=4; type::String)
-        if mVectorSize ≤ 360
+        if mVectorSize ≤ 2000
             if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
                 for i in 1:factorial(BlockSize)
                     fname_power_of_2 = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv"
@@ -293,13 +316,26 @@ module SavingInitialConditions
                     base10number = AlgorithmsOfmVectors.rev_algorithm_m_vector(mVector)
                     writedlm(fname_base10, base10number)
                 end
-            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
-                fname_power_of_2 = "RAW_DATA/INITIAL_CONDITIONS/n_0_1_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv"
-                fname_base10 = "RAW_DATA/INITIAL_CONDITIONS/n_0_1_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv"
-                mVector = readdlm(fname_power_of_2,Int64)
-                mVector = Vector(mVector[1,:])
-                base10number = AlgorithmsOfmVectors.rev_algorithm_m_vector(mVector)
-                writedlm(fname_base10, base10number)
+            elseif type == "Pascal"
+                pascalBlock = transpose(PascalTriangle.pascaltriangle(BlockSize))
+                allpascalblocks = unique(collect(permutations(pascalBlock)))
+                for i in eachindex(allpascalblocks)
+                    fname_power_of_2 = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv"
+                    fname_base10 = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv"
+                    mVector = readdlm(fname_power_of_2,Int64)
+                    mVector = Vector(mVector[:,1])
+                    base10number = AlgorithmsOfmVectors.rev_algorithm_m_vector(mVector)
+                    writedlm(fname_base10, base10number)
+                end
+            elseif type == "Linear" || type == "Oscilatory"
+                for i in 1:2
+                    fname_power_of_2 = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv"
+                    fname_base10 = "RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv"
+                    mVector = readdlm(fname_power_of_2,Int64)
+                    mVector = Vector(mVector[:,1])
+                    base10number = AlgorithmsOfmVectors.rev_algorithm_m_vector(mVector)
+                    writedlm(fname_base10, base10number) 
+                end
             end
         else
             if type == "Random"

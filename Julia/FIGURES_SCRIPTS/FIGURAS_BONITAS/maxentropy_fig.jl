@@ -4,7 +4,7 @@ using Plots.PlotMeasures
 using LaTeXStrings
 
 function main()
-    pasta = "FIGURES/VON_NEUMANN_ENTROPY"
+    pasta = "Julia/FIGURES_SCRIPTS/FIGURAS_BONITAS"
     mkpath(pasta)
 
 
@@ -68,7 +68,7 @@ function main()
                     label = "Random", left_margin = 8mm, legend = :bottomright)
     plt = plot!([0.6;1],[log(100);log(100)], ls = :dash, lc = :black, label = L"S_{\mathrm{lim}} = \ln(100)")
     #plt = plot!([3.5], lc = :red, label = "Random", left_margin = 5mm, yrange = (3.6,log(100)))
-    png(plt, string(pasta,"/S_max_all_conditions.png"))
+    savefig(plt, string(pasta,"/S_max_all_conditions.pdf"))
 end
 
 main()

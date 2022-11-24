@@ -5,42 +5,24 @@ using LaTeXStrings
 using Plots.PlotMeasures
 mkpath("FIGURES/fig3")
 
-function plotACF()
-    acf_rand = readdlm("DATA/ACF/acf_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_3.csv", BigFloat, header = false)
+function plotACFrand(i, blocksize)
+    acf_rand = readdlm("DATA/ACF/acf_n_0_$(i)_Random_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
     println("rand")
+
     iid_high_corr_rand = iid_highCorrelations(acf_rand, "rand")
+    writedlm("FIGURES/fig3/iid_high_corr_rand_$(i)_blocksize_$(blocksize).csv", iid_high_corr_rand)
     bartlett_high_corr_rand = Bartlett_highCorrelations(acf_rand, "rand")
+    writedlm("FIGURES/fig3/bartlett_high_corr_rand_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_rand)
 
-    acf_prime = readdlm("DATA/ACF/acf_n_0_1_Prime_mVectorSize_180_MaxRand_10_BlockSize_2.csv", BigFloat, header = false)
-    println("prime")
-    iid_high_corr_prime = iid_highCorrelations(acf_prime, "prime")
-    bartlett_high_corr_prime = Bartlett_highCorrelations(acf_prime, "prime")
-
-    acf_even = readdlm("DATA/ACF/acf_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_2.csv", BigFloat, header = false)
-    println("even")
-    iid_high_corr_even = iid_highCorrelations(acf_even, "even")
-    bartlett_high_corr_even = Bartlett_highCorrelations(acf_even, "even")
-
-    acf_odd = readdlm("DATA/ACF/acf_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_2.csv", BigFloat, header = false)
-    println("odd")
-    iid_high_corr_odd = iid_highCorrelations(acf_odd, "odd")
-    bartlett_high_corr_odd = Bartlett_highCorrelations(acf_odd, "odd")
-
-    acf_oscilatory = readdlm("DATA/ACF/acf_n_0_1_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_2.csv", BigFloat, header = false)
-    println("oscilatory")
-    iid_high_corr_oscilatory = iid_highCorrelations(acf_oscilatory, "oscilatory")
-    bartlett_high_corr_oscilatory = Bartlett_highCorrelations(acf_oscilatory, "oscilatory")
-
-    acf_pascal = readdlm("DATA/ACF/acf_n_0_1_Pascal Triangle_mVectorSize_180_MaxRand_10_BlockSize_2.csv", BigFloat, header = false)
-    println("pascal")
-    iid_high_corr_pascal = iid_highCorrelations(acf_pascal, "pascal")
-    bartlett_high_corr_pascal = Bartlett_highCorrelations(acf_pascal, "pascal")
+    # iid_high_corr_rand = readdlm("FIGURES/fig3/iid_high_corr_rand_$(i)_blocksize_$(blocksize).csv", header = false)
+    # bartlett_high_corr_rand = readdlm("FIGURES/fig3/bartlett_high_corr_rand_$(i)_blocksize_$(blocksize).csv", header = false)
 
     colors = [:red, :orange, :green, :blue, :purple, :magenta]
 
     figure_rand = plot(abs.(acf_rand),
                         lc = colors[1],
                         fontfamily = "Computer Modern",
+                        xminorticks = true,
                         left_margin = 5mm,
                         yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
                         xticks = [1, 10, 100, 1000], xlabel = L"\tau", ylabel = L"C( \tau)",
@@ -66,12 +48,30 @@ function plotACF()
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_rand = plot!(size = (400,200), dpi = 500, grid = true)
-    savefig(figure_rand, "FIGURES/fig3/acf_rand.pdf")
+    figure_rand = plot!(size = (300,200), dpi = 500, grid = true)
+    savefig(figure_rand, "FIGURES/fig3/acf_rand_$(i)_blocksize_$(blocksize).pdf")
+end
+
+function plotACFprime(i, blocksize)
+
+    acf_prime = readdlm("DATA/ACF/acf_n_0_$(i)_Prime_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    println("prime")
+
+    iid_high_corr_prime = iid_highCorrelations(acf_prime, "prime")
+    writedlm("FIGURES/fig3/iid_high_corr_prime_$(i)_blocksize_$(blocksize).csv", iid_high_corr_prime)
+    bartlett_high_corr_prime = Bartlett_highCorrelations(acf_prime, "prime")
+    writedlm("FIGURES/fig3/bartlett_high_corr_prime_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_prime)
+
+    # iid_high_corr_prime = readdlm("FIGURES/fig3/iid_high_corr_prime_$(i)_blocksize_$(blocksize).csv", header = false)
+    # bartlett_high_corr_prime = readdlm("FIGURES/fig3/bartlett_high_corr_prime_$(i)_blocksize_$(blocksize).csv", header = false)
+
+
+    colors = [:red, :orange, :green, :blue, :purple, :magenta]
 
     figure_prime = plot(abs.(acf_prime),
                         lc = colors[2],
                         fontfamily = "Computer Modern",
+                        xminorticks = true,
                         left_margin = 5mm,
                         yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
                         xticks = [1, 10, 100, 1000], xlabel = L"\tau", ylabel = L"C( \tau)",
@@ -97,11 +97,28 @@ function plotACF()
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_prime = plot!(size = (400,200), dpi = 500, grid = true)
-    savefig(figure_prime, "FIGURES/fig3/acf_prime.pdf")
+    figure_prime = plot!(size = (300,200), dpi = 500, grid = true)
+    savefig(figure_prime, "FIGURES/fig3/acf_prime_$(i)_blocksize_$(blocksize).pdf")
+end
+
+function plotACFeven(i, blocksize)
+
+    acf_even = readdlm("DATA/ACF/acf_n_0_$(i)_Even_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    println("even")
+    iid_high_corr_even = iid_highCorrelations(acf_even, "even")
+    writedlm("FIGURES/fig3/iid_high_corr_even_$(i)_blocksize_$(blocksize).csv", iid_high_corr_even)
+    bartlett_high_corr_even = Bartlett_highCorrelations(acf_even, "even")
+    writedlm("FIGURES/fig3/bartlett_high_corr_even_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_even)
+
+    # iid_high_corr_even = readdlm("FIGURES/fig3/iid_high_corr_even_$(i)_blocksize_$(blocksize).csv", header = false)
+    # bartlett_high_corr_even = readdlm("FIGURES/fig3/bartlett_high_corr_even_$(i)_blocksize_$(blocksize).csv", header = false)
+
+
+    colors = [:red, :orange, :green, :blue, :purple, :magenta]
 
     figure_even = plot(abs.(acf_even),
                         lc = colors[3],
+                        xminorticks = true,
                         fontfamily = "Computer Modern",
                         left_margin = 5mm,
                         yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
@@ -128,11 +145,28 @@ function plotACF()
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_even = plot!(size = (400,200), dpi = 500, grid = true)
-    savefig(figure_even, "FIGURES/fig3/acf_even.pdf")
+    figure_even = plot!(size = (300,200), dpi = 500, grid = true)
+    savefig(figure_even, "FIGURES/fig3/acf_even_$(i)_blocksize_$(blocksize).pdf")
+end
+
+function plotACFodd(i, blocksize)
+
+    acf_odd = readdlm("DATA/ACF/acf_n_0_$(i)_Odd_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    println("odd")
+    iid_high_corr_odd = iid_highCorrelations(acf_odd, "odd")
+    writedlm("FIGURES/fig3/iid_high_corr_odd_$(i)_blocksize_$(blocksize).csv", iid_high_corr_odd)
+    bartlett_high_corr_odd = Bartlett_highCorrelations(acf_odd, "odd")
+    writedlm("FIGURES/fig3/bartlett_high_corr_odd_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_odd)
+
+    # iid_high_corr_odd = readdlm("FIGURES/fig3/iid_high_corr_odd_$(i)_blocksize_$(blocksize).csv", header = false)
+    # bartlett_high_corr_odd = readdlm("FIGURES/fig3/bartlett_high_corr_odd_$(i)_blocksize_$(blocksize).csv", header = false)
+
+
+    colors = [:red, :orange, :green, :blue, :purple, :magenta]
 
     figure_odd = plot(abs.(acf_odd),
                         lc = colors[4],
+                        xminorticks = true,
                         fontfamily = "Computer Modern",
                         left_margin = 5mm,
                         yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
@@ -145,7 +179,7 @@ function plotACF()
     figure_odd = scatter!(iid_high_corr_odd[:,1],iid_high_corr_odd[:,2],
                         ms = 4,
                         label = L"C(\tau) > 3/\sqrt{N}",
-                        mc = :navyblue,
+                        mc = :darkblue,
                         markerstrokewidth = 0,
                         frame = :box,
                         yscale = :log10,
@@ -155,15 +189,32 @@ function plotACF()
                         marker = [:star],
                         markerstrokewidth = 3,
                         label = L"C(\tau) > 3\sigma_{C(\tau)}",
-                        mc = :navyblue,
+                        mc = :darkblue,
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_odd = plot!(size = (400,200), dpi = 500, grid = true)
-    savefig(figure_odd, "FIGURES/fig3/acf_odd.pdf")
+    figure_odd = plot!(size = (300,200), dpi = 500, grid = true)
+    savefig(figure_odd, "FIGURES/fig3/acf_odd_$(i)_blocksize_$(blocksize).pdf")
+end
+
+function plotACFoscilatory(i, blocksize)
+
+    acf_oscilatory = readdlm("DATA/ACF/acf_n_0_$(i)_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    println("oscilatory")
+    iid_high_corr_oscilatory = iid_highCorrelations(acf_oscilatory, "oscilatory")
+    writedlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_blocksize_$(blocksize).csv", iid_high_corr_oscilatory)
+    bartlett_high_corr_oscilatory = Bartlett_highCorrelations(acf_oscilatory, "oscilatory")
+    writedlm("FIGURES/fig3/bartlett_high_corr_oscilatory_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_oscilatory)
+
+    # iid_high_corr_oscilatory = readdlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_blocksize_$(blocksize).csv", header = false)
+    # bartlett_high_corr_oscilatory = readdlm("FIGURES/fig3/bartlett_high_corr_oscilatory_$(i)_blocksize_$(blocksize).csv", header = false)
+
+
+    colors = [:red, :orange, :green, :blue, :purple, :magenta]
 
     figure_oscilatory = plot(abs.(acf_oscilatory),
                         lc = colors[5],
+                        xminorticks = true,
                         fontfamily = "Computer Modern",
                         left_margin = 5mm,
                         yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
@@ -181,7 +232,7 @@ function plotACF()
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_oscilatory= scatter!(bartlett_high_corr_oscilatory[:,1],bartlett_high_corr_oscilatory[:,2],
+    figure_oscilatory = scatter!(bartlett_high_corr_oscilatory[:,1],bartlett_high_corr_oscilatory[:,2],
                         ms = 4,
                         marker = [:star],
                         markerstrokewidth = 3,
@@ -190,11 +241,27 @@ function plotACF()
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_oscilatory = plot!(size = (400,200), dpi = 500, grid = true)
-    savefig(figure_oscilatory, "FIGURES/fig3/acf_oscilatory.pdf")
+    figure_oscilatory = plot!(size = (300,200), dpi = 500, grid = true)
+    savefig(figure_oscilatory, "FIGURES/fig3/acf_oscilatory_$(i)_blocksize_$(blocksize).pdf")
+end
+
+function plotACFpascal(i, blocksize)
+
+    acf_pascal = readdlm("DATA/ACF/acf_n_0_$(i)_Pascal_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
+    println("pascal")
+    iid_high_corr_pascal = iid_highCorrelations(acf_pascal, "pascal")
+    writedlm("FIGURES/fig3/iid_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", iid_high_corr_pascal)
+    bartlett_high_corr_pascal = Bartlett_highCorrelations(acf_pascal, "pascal")
+    writedlm("FIGURES/fig3/bartlett_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_pascal)
+
+    # iid_high_corr_pascal = readdlm("FIGURES/fig3/iid_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", header = false)
+    # bartlett_high_corr_pascal = readdlm("FIGURES/fig3/bartlett_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", header = false)
+
+    colors = [:red, :orange, :green, :blue, :purple, :magenta]
 
     figure_pascal = plot(abs.(acf_pascal),
                         lc = colors[6],
+                        xminorticks = true,
                         fontfamily = "Computer Modern",
                         left_margin = 5mm,
                         yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
@@ -207,22 +274,22 @@ function plotACF()
     figure_pascal = scatter!(iid_high_corr_pascal[:,1],iid_high_corr_pascal[:,2],
                         ms = 4,
                         label = L"C(\tau) > 3/\sqrt{N}",
-                        mc = :darkviolet,
+                        mc = :magenta3,
                         markerstrokewidth = 0,
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_pascal= scatter!(bartlett_high_corr_pascal[:,1],bartlett_high_corr_pascal[:,2],
+    figure_pascal = scatter!(bartlett_high_corr_pascal[:,1],bartlett_high_corr_pascal[:,2],
                         ms = 4,
                         marker = [:star],
                         markerstrokewidth = 3,
                         label = L"C(\tau) > 3\sigma_{C(\tau)}",
-                        mc = :darkviolet,
+                        mc = :magenta3,
                         frame = :box,
                         yscale = :log10,
                         xscale = :log10)
-    figure_pascal = plot!(size = (400,200), dpi = 500, grid = true)
-    savefig(figure_pascal, "FIGURES/fig3/acf_pascal.pdf")
+    figure_pascal = plot!(size = (300,200), dpi = 500, grid = true)
+    savefig(figure_pascal, "FIGURES/fig3/acf_pascal_$(i)_blocksize_$(blocksize).pdf")
 end
 
 function Bartlett_highCorrelations(x, type)
@@ -270,4 +337,15 @@ function iid_highCorrelations(x, type)
     return(high_corr)
 end
 
-plotACF()
+is = rand(1:factorial(5),10)
+blocksize = 3
+
+
+plotACFrand(i, blocksize)
+# for i in is
+#     plotACFprime(i, blocksize)
+#     plotACFeven(i, blocksize)
+#     plotACFodd(i, blocksize)
+# end
+# plotACFoscilatory(i, blocksize)
+# plotACFpascal(i, blocksize)

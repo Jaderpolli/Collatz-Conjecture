@@ -1,219 +1,110 @@
-using Plots, Plots.PlotMeasures, DelimitedFiles, ColorSchemes, LaTeXStrings, Colors, ColorSchemeTools
-using CSV, StatsPlots, DataFrames
-pasta = "FIGURES/fig2"
-mkpath(pasta)
+module PascalTriangle
+    function pascaltriangle(n)
 
-function ps_boxplots()
-    mVectorSizes = [180, 2100]
-    MaxRand = 10
-    maximumBlockSize =  5
-    types1 = ["Random", "Prime", "Odd", "Even"]
-    PL = zeros(4, 156)
-    L = 0
+    row=Any[]
 
-    for type in types1
-        L +=1
-        power_law = []
-        for mVectorSize in mVectorSizes
-            if mVectorSize < 360
-                for j in 2:maximumBlockSize
-                    BlockSize = j
-                    for k in 1:factorial(BlockSize)
-                        fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                        power_law = vcat(power_law, fit[2])
-                    end
-                end
-            else
-                if type == "Random"
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                            fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                            power_law = vcat(power_law, fit[2])
-                    end
-                else
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                        fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                        power_law = vcat(power_law, fit[2])
-                    end
-                end
-            end
+    #base case
+    if n==1
+
+        return Any[1]
+
+    elseif n==2
+
+        return Any[1,1]
+
+    else
+
+        #calculate the elements in each row
+        for i in 2:n-1
+
+            #rolling sum all the values within 2 windows from the previous row
+            #but we cannot include two boundary numbers 1 in this row
+            push!(row,pascaltriangle(n-1)[i-1]+pascaltriangle(n-1)[i])
+
         end
-        PL[L,:] = power_law[:]
+
+        #append 1 for both front and rear of the row
+        pushfirst!(row,1)
+        push!(row,1)
+
     end
 
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
+    return row
 
-    data= DataFrame(transpose(PL), types1)
-    a = plot(size = (400,300), fontfamily = "Computer Modern",
+    end
+end
+
+using Plots, Plots.PlotMeasures, DelimitedFiles, ColorSchemes, LaTeXStrings, Colors, ColorSchemeTools
+using CSV, StatsPlots, DataFrames, Combinatorics
+pasta = "FIGURES/fig2"
+mkpath(pasta)
+import Main.PascalTriangle
+
+function ps_boxplots()
+
+    types = ["Random", "Prime", "Odd", "Even", "Oscilatory", "Pascal", "Linear"]
+
+    a = plot(size = (420,250), fontfamily = "Computer Modern", frame = :box,
         xlabel = "type",
         ylabel =  L"\beta", dpi = 500)
-    a = @df data dotplot!(["Random"], :Random, marker = (colors[1], stroke(0)), label = false)
-    a = @df data boxplot!(["Random"], :Random, fillalpha  = 0.7, c = colors[1], label = false, linewidth = 2)
-    a =@df data dotplot!(["Prime"], :Prime, marker = (colors[2], stroke(0)), label = false)
-    a =@df data boxplot!(["Prime"], :Prime, fillalpha  = 0.7, c = colors[2], label = false, linewidth = 2)
-    a =@df data dotplot!(["Even"], :Even, marker = (colors[3], stroke(0)), label = false)
-    a =@df data boxplot!(["Even"], :Even, fillalpha  = 0.7, c = colors[3], label = false, linewidth = 2)
-    a =@df data dotplot!(["Odd"], :Odd, marker = (colors[4], stroke(0)), label = false)
-    a =@df data boxplot!(["Odd"], :Odd, fillalpha  = 0.7, c = colors[4], label = false, linewidth = 2)
-
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        types2 = ["Oscilatory", "Pascal Triangle"]
-        PL = zeros(2, 8)
-        L = 0
-
-        for type in types2
-            L +=1
-            power_law = []
-            for mVectorSize in mVectorSizes
-                if mVectorSize < 360
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                            fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                            power_law = vcat(power_law, fit[2])
-                    end
-                else
-                    if type == "Random"
-                        for j in 2:maximumBlockSize
-                            BlockSize = j
-                            k = 1
-                                fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                                power_law = vcat(power_law, fit[2])
-                        end
-                    else
-                        for j in 2:maximumBlockSize
-                            BlockSize = j
-                            k = 1
-                            fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                            power_law = vcat(power_law, fit[2])
-                        end
-                    end
-                end
-            end
-            PL[L,:] = power_law[:]
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
+    j = 0
+    
+    for type in types
+        j = j+1
+        folder = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_$(type)"
+        files = readdir(folder)
+        power_law = []
+        PL = zeros(1, length(files))
+        for file in files
+            fit = readdlm(string(folder,"/",file))
+            power_law = vcat(power_law, fit[2])
         end
-    data= DataFrame(transpose(PL), ["Oscilatory", "Pascal"])
-    a = @df data dotplot!(["Oscilatory"], :Oscilatory, marker = (colors[5], stroke(0)), label = false)
-    a = @df data boxplot!(["Oscilatory"], :Oscilatory, fillalpha  = 0.7, c = colors[5], label = false, linewidth = 2)
-    a = @df data dotplot!(["Pascal"], :Pascal, marker = (colors[6], stroke(0)), label = false)
-    a = @df data boxplot!(["Pascal"], :Pascal, fillalpha  = 0.7, c = colors[6], label = false, linewidth = 2)
+        PL[1,:] = power_law
+        data = DataFrame(transpose(PL), [type])
+        a = @df data dotplot!([type], data[!,1], marker = (colors[j], stroke(0)), label = false)
+        a = @df data boxplot!([type], data[!,1], fillalpha  = 0.7, c = colors[j], label = false, linewidth = 2)
+    end
+
     savefig(a, string(pasta,"/ps_box_plot.pdf"))
 end
 
 function DFA_boxplots()
-    mVectorSizes = [180, 2100]
-    MaxRand = 10
-    maximumBlockSize =  5
-    types1 = ["Random", "Prime", "Odd", "Even"]
-    PL = zeros(4, 156)
-    L = 0
+    types = ["Random", "Prime", "Odd", "Even", "Oscilatory", "Pascal", "Linear"]
 
-    for type in types1
-        L +=1
-        power_law = []
-        for mVectorSize in mVectorSizes
-            if mVectorSize < 360
-                for j in 2:maximumBlockSize
-                    BlockSize = j
-                    for k in 1:factorial(BlockSize)
-                        fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                        power_law = vcat(power_law, fit[2])
-                    end
-                end
-            else
-                if type == "Random"
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                            fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                            power_law = vcat(power_law, fit[2])
-                    end
-                else
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                        fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                        power_law = vcat(power_law, fit[2])
-                    end
-                end
-            end
-        end
-        PL[L,:] = power_law[:]
-    end
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    data= DataFrame(transpose(PL), types1)
-    a = plot(size = (400,300), fontfamily = "Computer Modern",
+    a = plot(size = (420,250), fontfamily = "Computer Modern", frame = :box,
         xlabel = "type",
         ylabel =  L"\alpha", dpi = 500)
-    a = @df data dotplot!(["Random"], :Random, marker = (colors[1], stroke(0)), label = false)
-    a = @df data boxplot!(["Random"], :Random, fillalpha  = 0.7, c = colors[1], label = false, linewidth = 2)
-    a =@df data dotplot!(["Prime"], :Prime, marker = (colors[2], stroke(0)), label = false)
-    a =@df data boxplot!(["Prime"], :Prime, fillalpha  = 0.7, c = colors[2], label = false, linewidth = 2)
-    a =@df data dotplot!(["Even"], :Even, marker = (colors[3], stroke(0)), label = false)
-    a =@df data boxplot!(["Even"], :Even, fillalpha  = 0.7, c = colors[3], label = false, linewidth = 2)
-    a =@df data dotplot!(["Odd"], :Odd, marker = (colors[4], stroke(0)), label = false)
-    a =@df data boxplot!(["Odd"], :Odd, fillalpha  = 0.7, c = colors[4], label = false, linewidth = 2)
-
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        types2 = ["Oscilatory", "Pascal Triangle"]
-        PL = zeros(2, 8)
-        L = 0
-
-        for type in types2
-            L +=1
-            power_law = []
-            for mVectorSize in mVectorSizes
-                if mVectorSize < 360
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        k = 1
-                            fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                            power_law = vcat(power_law, fit[2])
-                    end
-                else
-                    if type == "Random"
-                        for j in 2:maximumBlockSize
-                            BlockSize = j
-                            k = 1
-                                fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                                power_law = vcat(power_law, fit[2])
-                        end
-                    else
-                        for j in 2:maximumBlockSize
-                            BlockSize = j
-                            k = 1
-                            fit = readdlm("D:/WINDOWS/Usuario/Documents/Collatz_map/DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(k)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv")
-                            power_law = vcat(power_law, fit[2])
-                        end
-                    end
-                end
-            end
-            PL[L,:] = power_law[:]
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
+    j = 0
+    
+    for type in types
+        j = j+1
+        folder = "DATA/DFA_STATIONARY_FIT/DFA_FIT_$(type)"
+        files = readdir(folder)
+        power_law = []
+        PL = zeros(1, length(files))
+        for file in files
+            fit = readdlm(string(folder,"/",file))
+            power_law = vcat(power_law, fit[2])
         end
-    data= DataFrame(transpose(PL), ["Oscilatory", "Pascal"])
-    a = @df data dotplot!(["Oscilatory"], :Oscilatory, marker = (colors[5], stroke(0)), label = false)
-    a = @df data boxplot!(["Oscilatory"], :Oscilatory, fillalpha  = 0.7, c = colors[5], label = false, linewidth = 2)
-    a = @df data dotplot!(["Pascal"], :Pascal, marker = (colors[6], stroke(0)), label = false, yrange = (0.35, 0.65))
-    a = @df data boxplot!(["Pascal"], :Pascal, fillalpha  = 0.7, c = colors[6], label = false, linewidth = 2)
+        PL[1,:] = power_law
+        data = DataFrame(transpose(PL), [type])
+        a = @df data dotplot!([type], data[!,1], marker = (colors[j], stroke(0)), label = false)
+        a = @df data boxplot!([type], data[!,1], fillalpha  = 0.7, c = colors[j], label = false, linewidth = 2)
+    end
+
     savefig(a, string(pasta,"/DFA_box_plot.pdf"))
 end
 
 function plot_ps()
-    randpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_2.csv", header=false)
-    primepowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_3_Prime_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
-    evenpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
-    oddpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
-    oscilatorypowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_1_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
-    pascalpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/powerspectra_n_0_1_Pascal Triangle_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    randpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Random/powerspectra_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_2.csv", header=false)
+    primepowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Prime/powerspectra_n_0_3_Prime_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
+    evenpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Even/powerspectra_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    oddpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Odd/powerspectra_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    oscilatorypowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Oscilatory/powerspectra_n_0_2_Oscilatory_mVectorSize_2000_MaxRand_10_BlockSize_2.csv", header=false)
+    pascalpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Pascal/powerspectra_n_0_1_Pascal Triangle_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header=false)
+    linearpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Linear/powerspectra_n_0_2_Linear_mVectorSize_1000_MaxRand_10_BlockSize_3.csv", header=false)
 
     figure = plot(
                 yscale = :log10,
@@ -232,36 +123,39 @@ function plot_ps()
             minorticks = true
     )
 
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
 
     figure = plot!(randpowerspectra[:,1],randpowerspectra[:,2],  lc = colors[1], label = false)
     figure = plot!(primepowerspectra[:,1], primepowerspectra[:,2], linealpha = 0.8, lc = colors[2], label = false)
     figure = plot!(evenpowerspectra[:,1], evenpowerspectra[:,2], linealpha = 0.7, lc = colors[3], label = false)
     figure = plot!(oddpowerspectra[:,1], oddpowerspectra[:,2], linealpha = 0.6, lc = colors[4], label = false)
     figure = plot!(oscilatorypowerspectra[:,1], oscilatorypowerspectra[:,2], linealpha = 0.5, lc = colors[5], label = false)
-    figure = plot!(pascalpowerspectra[:,1], pascalpowerspectra[:,2], linealpha = 0.4, lc = colors[6], label = false)
+    figure = plot!(pascalpowerspectra[:,1], pascalpowerspectra[:,2], linealpha = 0.5, lc = colors[6], label = false)
+    figure = plot!(linearpowerspectra[:,1], linearpowerspectra[:,2], linealpha = 0.3, lc = colors[7], label = false)
     figure = plot!(size = (400, 250), dpi = 500, left_margin = 5mm, bottom_margin = 1mm)
-    figure = plot!(randpowerspectra[:,1], 0.3*randpowerspectra[:,1].^(0), ls = :dash, lc = :black, label = L"f^{0}")
+    figure = plot!(randpowerspectra[:,1], 0.3*randpowerspectra[:,1].^(0), ls = :dash, lc = :black, label = L"c \propto f^{0}")
     savefig(figure, string(pasta, "/power_spectra_plot.pdf"))
 end
 
 function plot_dfa()
-    randdfa = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_2.csv", header=false)
-    primedfa = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_3_Prime_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
-    evendfa = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
-    odddfa = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
-    oscilatorydfa = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_1_Oscilatory_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
-    pascaldfa = readdlm("DATA/DFA_STATIONARY/dfa_stationary_n_0_1_Pascal Triangle_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    randdfa = readdlm("DATA/DFA_STATIONARY/DFA_Random/dfa_stationary_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_2.csv", header=false)
+    primedfa = readdlm("DATA/DFA_STATIONARY/DFA_Prime/dfa_stationary_n_0_3_Prime_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
+    evendfa = readdlm("DATA/DFA_STATIONARY/DFA_Even/dfa_stationary_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
+    odddfa = readdlm("DATA/DFA_STATIONARY/DFA_Odd/dfa_stationary_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    oscilatorydfa = readdlm("DATA/DFA_STATIONARY/DFA_Oscilatory/dfa_stationary_n_0_2_Oscilatory_mVectorSize_1200_MaxRand_10_BlockSize_6.csv", header=false)
+    pascaldfa = readdlm("DATA/DFA_STATIONARY/DFA_Pascal/dfa_stationary_n_0_1_Pascal Triangle_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header=false)
+    lineardfa = readdlm("DATA/DFA_STATIONARY/DFA_Linear/dfa_stationary_n_0_1_Linear_mVectorSize_1000_MaxRand_10_BlockSize_3.csv", header=false)
 
     figure = plot(
                 yscale = :log10,
                 xscale = :log10,
                 fontfamily = "Computer Modern",
-                xlabel = L"n",
-                ylabel = L"F(n)",
+                xlabel = L"\ell",
+                ylabel = L"F(\ell)",
                 yguidefontrotation = -90,
                 framestyle = :box,
-                legend = :topleft
+                legend = :topleft,
+                fg_legend = :false
     )
     figure = plot!( xticks = [1, 10, 100, 1000],
             yticks = [0.1, 1, 10],
@@ -269,18 +163,20 @@ function plot_dfa()
             minorticks = true
     )
 
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
 
     figure = plot!(randdfa[:,1],randdfa[:,2], lc = colors[1],  ms = 2, marker = (colors[1], stroke(0)),  markeralpha = 1, label = "Random")
-    figure = plot!(primedfa[:,1], primedfa[:,2], linealpha = 0.8, lc = colors[2],  ms = 2, marker = (colors[2], stroke(0)),  markeralpha = 0.8, label = "Prime")
-    figure = plot!(evendfa[:,1], evendfa[:,2], linealpha = 0.7, lc = colors[3],  ms = 2, marker = (colors[3], stroke(0)),  markeralpha = 0.7, label = "Even")
-    figure = plot!(odddfa[:,1], odddfa[:,2], linealpha = 0.6, lc = colors[4],  ms = 2, marker = (colors[4], stroke(0)),  markeralpha = 0.6, label = "Odd")
-    figure = plot!(oscilatorydfa[:,1], oscilatorydfa[:,2], linealpha = 0.5, lc = colors[5],  ms = 2, marker = (colors[5], stroke(0)), markeralpha = 0.5, label = "Oscilatory")
-    figure = plot!(pascaldfa[:,1], pascaldfa[:,2], linealpha = 0.4, lc = colors[6],  ms = 2, marker = (colors[6], stroke(0)),  markeralpha = 0.4,label = "Pascal Triangle")
+    figure = plot!(primedfa[:,1], primedfa[:,2], linealpha = 0.8, lc = colors[2],  ms = 1.5, marker = (colors[2], stroke(0)),  markeralpha = 0.8, label = "Prime")
+    figure = plot!(evendfa[:,1], evendfa[:,2], linealpha = 0.7, lc = colors[3],  ms = 1.5, marker = (colors[3], stroke(0)),  markeralpha = 0.7, label = "Even")
+    figure = plot!(odddfa[:,1], odddfa[:,2], linealpha = 0.6, lc = colors[4],  ms = 1.5, marker = (colors[4], stroke(0)),  markeralpha = 0.6, label = "Odd")
+    figure = plot!(oscilatorydfa[:,1], oscilatorydfa[:,2], linealpha = 0.5, lc = colors[5],  ms = 1.5, marker = (colors[5], stroke(0)), markeralpha = 0.5, label = "Oscilatory")
+    figure = plot!(pascaldfa[:,1], pascaldfa[:,2], linealpha = 0.4, lc = colors[6],  ms = 1.5, marker = (colors[6], stroke(0)),  markeralpha = 0.4,label = "Pascal")
+    figure = plot!(lineardfa[:,1], lineardfa[:,2], linealpha = 0.4, lc = colors[7],  ms = 1.5, marker = (colors[7], stroke(0)),  markeralpha = 0.4,label = "Linear")
     figure = plot!(size = (400, 250), dpi = 500, left_margin = 5mm, bottom_margin = 1mm)
-    figure = plot!(randdfa[:,1], 0.2*randdfa[:,1].^(1/2), ls = :dash, lc = :black, label = L"n^{1/2}")
+    figure = plot!(oscilatorydfa[:,1], 0.2*oscilatorydfa[:,1].^(1/2), ls = :dash, lc = :black, label = L"n^{1/2}")
     savefig(figure, string(pasta, "/dfa_plot.pdf"))
 end
+
 
 
 ps_boxplots()

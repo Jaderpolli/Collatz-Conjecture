@@ -58,7 +58,7 @@ end
 
 function highCorrelations(x)
     high_corr = reshape([],0,2)
-    for i in 1:length(x)
+    for i in eachindex(x)
         if x[i] > 0.1
             hc = [i x[i]]
             high_corr = vcat(high_corr, hc)

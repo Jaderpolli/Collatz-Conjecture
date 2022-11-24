@@ -55,6 +55,43 @@ module OrbitsBase10
     end
 end
 
+module PascalTriangle
+    function pascaltriangle(n)
+
+    row=Any[]
+
+    #base case
+    if n==1
+
+        return Any[1]
+
+    elseif n==2
+
+        return Any[1,1]
+
+    else
+
+        #calculate the elements in each row
+        for i in 2:n-1
+
+            #rolling sum all the values within 2 windows from the previous row
+            #but we cannot include two boundary numbers 1 in this row
+            push!(row,pascaltriangle(n-1)[i-1]+pascaltriangle(n-1)[i])
+
+        end
+
+        #append 1 for both front and rear of the row
+        pushfirst!(row,1)
+        push!(row,1)
+
+    end
+
+    return row
+
+    end
+end
+
+
 # this module saves the orbit in base 10 into a .csv file
 module SavingOrbitsBase10
 
@@ -65,19 +102,27 @@ module SavingOrbitsBase10
     using Combinatorics
     using DataFrames
     using DelimitedFiles
+    import Main.PascalTriangle
 
     function savingorbitbase10(mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4; type::String)
-        if mVectorSize ≤ 360
+        if mVectorSize ≤ 2000
             if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
                 for i in 1:factorial(BlockSize)
-                    println(i/factorial(BlockSize)*100) #time counter
                     orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
                     writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
                 end
-            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
-                i = 1
-                orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
-                writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+            elseif type == "Pascal"
+                pascalBlock = transpose(PascalTriangle.pascaltriangle(BlockSize))
+                allpascalblocks = unique(collect(permutations(pascalBlock)))
+                for i in eachindex(allpascalblocks)
+                    orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+                end
+            elseif type == "Linear" || type == "Oscilatory"
+                for i in 1:2
+                    orbit= OrbitsBase10.orbitbase10(i, mVectorSize, MaxRand, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv",orbit, header = false)
+                end
             end
         else
             if type == "Random"
@@ -119,7 +164,7 @@ module OrbitPowersOf2
 
     function orbitpowerof2(orbit)
         M = Array{Union{Nothing,Matrix{Int64}}}(nothing,length(orbit))
-        for j in 1:length(orbit)
+        for j in eachindex(orbit)
             mVector = AlgorithmsOfmVectors.algorithm_m_vector(orbit[j])
             M[j] = transpose(mVector) # the transpose is only to write every m-vector as a line of M
         end
@@ -154,25 +199,36 @@ module SavingOrbitsPowerOf2
     using DelimitedFiles
     using Primes
     using Combinatorics
+    import Main.PascalTriangle
 
     function savingorbitpowerof2(mVectorSize::Int64=100,MaxRand::Int64=10, BlockSize::Int64=4; type::String)
-        if mVectorSize ≤ 360
+        if mVectorSize ≤ 2000
             if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
                 for i in 1:factorial(BlockSize)
-                    println(i/factorial(BlockSize)*100)
                     orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
                     m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
                     m = transpose(m)
                     M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
                     writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
                 end
-            elseif type == "Pascal Triangle" || type == "Oscilatory" || type == "Linear"
-                i = 1
-                orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
-                m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
-                m = transpose(m)
-                M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
-                writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+            elseif type == "Pascal"
+                pascalBlock = transpose(PascalTriangle.pascaltriangle(BlockSize))
+                allpascalblocks = unique(collect(permutations(pascalBlock)))
+                for i in eachindex(allpascalblocks)
+                    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
+                    m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                    m = transpose(m)
+                    M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+                end
+            elseif type == "Linear" || type == "Oscilatory"
+                for i in 1:2
+                    orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_base10.csv", BigInt, header = false)
+                    m = readdlm("RAW_DATA/INITIAL_CONDITIONS/n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", header = false)
+                    m = transpose(m)
+                    M = OrbitPowersOf2.fastorbitpowerof2(m, orbit, BlockSize; type)
+                    writedlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize)_power_of_2.csv", M, header = false)
+                end
             end
         else
             if type == "Random"

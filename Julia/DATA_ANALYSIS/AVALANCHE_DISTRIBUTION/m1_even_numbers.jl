@@ -19,7 +19,7 @@ function distributionm1(initial::Int64, final::Int64)
         s = count(x -> (x==i), m1s)
         distribution = vcat(distribution, s)
     end
-    x = 1:1:length(distribution)
+    x = 1:eachindex(distribution)
     figure = plot(
             titlefontsize= 9,
             title = "Distribuição de valores de "*L"m_1"*" entre os pares de $(6*initial+2) a $(6*final+2)",

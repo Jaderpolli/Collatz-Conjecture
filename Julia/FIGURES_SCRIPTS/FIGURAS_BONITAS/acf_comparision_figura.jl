@@ -5,7 +5,7 @@ using LaTeXStrings
 using Plots.PlotMeasures
 
 function plotACF()
-    mkpath("FIGURES/ACF_FIGURES")
+    oasta ="Julia/FIGURES_SCRIPTS/FIGURAS_BONITAS"
 
     mVectorSize = 180
 
@@ -30,23 +30,6 @@ function plotACF()
 
                 figure = plot(layout = (2,1), fontfamily = "Computer Modern",size = (500,350), #minorticks = true,
                         dpi = 500)
-                #=figure = plot!(log.(orbit_rand),
-                                    title = "Random Initial "*L"m-"*"vector",
-                                    fontfamily = "Computer Modern",
-                                    left_margin = 5mm,
-                                    subplot = 1,
-                                    label = "Initial Condition"*L" = \mathrm{rand}",
-                                    legend = :bottomleft,
-                                    xlabel = L"t",
-                                    ylabel = L"\log_2(f(t))",
-                                    lc = :black)
-                figure = plot!(log.(orbit_prim),
-                                    subplot =2,
-                                    legend = :bottomleft,
-                                    title = "Prime Initial "*L"m-"*"vector",
-                                    label = label = "Initial Condition"*L" = \mathrm{prime}, b = %$(primeBlockSize)",
-                                    xlabel = L"t",
-                                    lc = :black)=#
                 figure = plot!(abs.(acf_rand),
                                     subplot = #=3,=# 1,
                                     #minorgrid = true,
@@ -60,7 +43,7 @@ function plotACF()
                                     legend = :bottomleft,
                                     label = L"C( \tau)")
                 figure = scatter!(high_corr_rand[:,1],high_corr_rand[:,2],
-                                    subplot = #=3=# 1, ms = 4,
+                                    subplot = #=3=# 1, ms = 4, c= :orange,
                                     label = L"C(\tau) > 0.1",
                                     lc = :green,
                                     markerstrokewidth = 0,
@@ -82,13 +65,14 @@ function plotACF()
                 figure = scatter!(high_corr_prim[:,1],high_corr_prim[:,2],
                                     label = L"C(\tau) > 0.1",
                                     subplot = #=4=# 2,
+                                    c = :orange,
                                     ms = 4,
                                     markerstrokewidth = 0,
                                     yscale = :log10,
                                     xscale = :log10,
                                     left_margin = 10mm,
                                     annotation = ((0.5,0.9), L"(b)"))
-                png(figure, "FIGURES/ACF_FIGURES/paper_acf_n_0_$(k)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_primeBlockSize_$(primeBlockSize).png")
+                savefig(figure, string(pasta,"/acf.pdf"))
             end
     end
 end

@@ -10,7 +10,7 @@ function main()
     maximumPrimeBlockSize =  6
     types = ["Random", "Prime"]
 
-    for i in 1:length(types)
+    for i in eachindex(types)
         type = types[i]
         for j in 2:maximumPrimeBlockSize
             primeBlockSize = j
