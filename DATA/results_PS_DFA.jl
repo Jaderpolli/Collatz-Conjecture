@@ -2,419 +2,185 @@ module FunctionsReadFit
     using StatsBase, DelimitedFiles, DataFrames, CSV
 
     function allβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        types = ["Random", "Prime", "Even", "Odd", "Pascal Triangle", "Oscilatory", "Linear"]
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT"
+        folders = readdir(main)
+        datas = []
         βs = []
-        for mVectorSize in mVectorSizes
-            i = 0
-            for type in types
-                i += 1
-                if type == "Linear"
-                    mVectorSize = 180
-                    BlockSizes = [30, 60, 180]
-                    for BlockSize in BlockSizes
-                        β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_1_Linear_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        βs = vcat(βs, β[2])
-                    end
-                else
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        if mVectorSize ≤ 360
-                            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
-                                for i in 1:factorial(BlockSize)
-                                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                    βs = vcat(βs, β[2])
-                                end
-                            elseif type == "Pascal Triangle" || type == "Oscilatory"
-                                i = 1
-                                β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                βs = vcat(βs, β[2])
-                            end
-                        else
-                            if type == "Random"
-                                for i in 1:4
-                                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                    βs = vcat(βs, β[2])
-                                end
-                            else
-                                i = 1
-                                β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                βs = vcat(βs, β[2])
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function randomβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Random"
-        βs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        βs = vcat(βs, β[2])
-                    end
-                else
-                    for i in 1:4
-                        β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        βs = vcat(βs, β[2])
-                    end
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function primeβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Prime"
-        βs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        βs = vcat(βs, β[2])
-                    end
-                else
-                    i = 1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function evenβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Even"
-        βs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        βs = vcat(βs, β[2])
-                    end
-                else
-                    i = 1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function oddβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Odd"
-        βs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        βs = vcat(βs, β[2])
-                    end
-                else
-                    i = 1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function oscilatoryβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Oscilatory"
-        βs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    i=1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                else
-                    i = 1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function pascalβ()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Pascal Triangle"
-        βs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    i=1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                else
-                    i = 1
-                    β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    βs = vcat(βs, β[2])
-                end
-            end
-        end
-        return(βs)
-    end
-
-    function linearβ()
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Linear"
-        βs = []
-        for j in 2:maximumBlockSize
-            mVectorSize = 180
-            BlockSizes = [30, 60, 180]
-            for BlockSize in BlockSizes
-                β = readdlm("DATA/POWER_SPECTRA_STATIONARY_FIT/fit_powerspectra_n_0_1_Linear_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
+        for folder in folders
+            datas = readdir(string(main, "/", folder))
+            for data in datas
+                β = readdlm(string(main,"/", folder, "/",data))
                 βs = vcat(βs, β[2])
             end
         end
         return(βs)
     end
 
+    function randomβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Random"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
+    function primeβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Prime"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
+    function evenβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Even"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
+    function oddβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Odd"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
+    function oscilatoryβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Oscilatory"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
+    function pascalβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Pascal"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
+    function linearβ()
+        main = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_Linear"
+        datas = readdir(main)
+        βs = []
+        for data in datas
+            β = readdlm(string(main,"/",data))
+            βs = vcat(βs, β[2])
+        end
+        return(βs)
+    end
+
     function allα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        types = ["Random", "Prime", "Even", "Odd", "Pascal Triangle", "Oscilatory", "Linear"]
+        main = "DATA/DFA_STATIONARY_FIT"
+        folders = readdir(main)
+        datas = []
         αs = []
-        for mVectorSize in mVectorSizes
-            i = 0
-            for type in types
-                i += 1
-                if type == "Linear"
-                    mVectorSize = 180
-                    BlockSizes = [30, 60, 180]
-                    for BlockSize in BlockSizes
-                        α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_1_Linear_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        αs = vcat(αs, α[2])
-                    end
-                else
-                    for j in 2:maximumBlockSize
-                        BlockSize = j
-                        if mVectorSize ≤ 360
-                            if type == "Random" || type == "Prime" || type == "Even" || type == "Odd"
-                                for i in 1:factorial(BlockSize)
-                                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                    αs = vcat(αs, α[2])
-                                end
-                            elseif type == "Pascal Triangle" || type == "Oscilatory"
-                                i = 1
-                                α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                αs = vcat(αs, α[2])
-                            end
-                        else
-                            if type == "Random"
-                                for i in 1:4
-                                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                    αs = vcat(αs, α[2])
-                                end
-                            else
-                                i = 1
-                                α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                                αs = vcat(αs, α[2])
-                            end
-                        end
-                    end
-                end
+        for folder in folders
+            datas = readdir(string(main, "/", folder))
+            for data in datas
+                α = readdlm(string(main,"/", folder, "/",data))
+                αs = vcat(αs, α[2])
             end
         end
         return(αs)
     end
 
     function randomα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Random"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Random"
+        datas = readdir(main)
         αs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        αs = vcat(αs, α[2])
-                    end
-                else
-                    for i in 1:4
-                        α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        αs = vcat(αs, α[2])
-                    end
-                end
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
 
     function primeα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Prime"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Prime"
+        datas = readdir(main)
         αs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        αs = vcat(αs, α[2])
-                    end
-                else
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                end
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
 
     function evenα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Even"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Even"
+        datas = readdir(main)
         αs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        αs = vcat(αs, α[2])
-                    end
-                else
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                end
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
 
     function oddα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Odd"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Odd"
+        datas = readdir(main)
         αs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    for i in 1:factorial(BlockSize)
-                        α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                        αs = vcat(αs, α[2])
-                    end
-                else
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                end
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
 
     function oscilatoryα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Oscilatory"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Oscilatory"
+        datas = readdir(main)
         αs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                else
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                end
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
 
     function pascalα()
-        mVectorSizes = [180, 2100]
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Pascal Triangle"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Pascal"
+        datas = readdir(main)
         αs = []
-        for mVectorSize in mVectorSizes
-            for j in 2:maximumBlockSize
-                BlockSize = j
-                if mVectorSize ≤ 360
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                else
-                    i = 1
-                    α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                    αs = vcat(αs, α[2])
-                end
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
 
     function linearα()
-        MaxRand = 10
-        maximumBlockSize =  5
-        type = "Linear"
+        main = "DATA/DFA_STATIONARY_FIT/DFA_FIT_Odd"
+        datas = readdir(main)
         αs = []
-        for j in 2:maximumBlockSize
-            mVectorSize = 180
-            BlockSizes = [30, 60, 180]
-            for BlockSize in BlockSizes
-                α = readdlm("DATA/DFA_STATIONARY_FIT/fit_dfa_stationary_n_0_1_Linear_mVectorSize_$(mVectorSize)_MaxRand_$(MaxRand)_BlockSize_$(BlockSize).csv", header = false)
-                αs = vcat(αs, α[2])
-            end
+        for data in datas
+            α = readdlm(string(main,"/",data))
+            αs = vcat(αs, α[2])
         end
         return(αs)
     end
@@ -425,103 +191,109 @@ module ResultsMeanStd
     import.Main.FunctionsReadFit
 
     function α()
+        folder = "DATA/Results_alfa"
+        mkpath(folder)
+
         αs = FunctionsReadFit.allα()
         mean_and_stdα = mean_and_std(αs)
         allresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/allresultsα.csv", allresultsα)
+        CSV.write(string(folder,"/allresultsα.csv"), allresultsα)
 
         αs = FunctionsReadFit.randomα()
         mean_and_stdα = mean_and_std(αs)
         randomresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/randomresultsα.csv", randomresultsα)
+        CSV.write(string(folder,"/randomresultsα.csv"), randomresultsα)
 
         αs = FunctionsReadFit.primeα()
         mean_and_stdα = mean_and_std(αs)
         primeresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/primeresultsα.csv", primeresultsα)
+        CSV.write(string(folder,"/primeresultsα.csv"), primeresultsα)
 
         αs = FunctionsReadFit.evenα()
         mean_and_stdα = mean_and_std(αs)
         evenresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/evenresultsα.csv", evenresultsα)
+        CSV.write(string(folder,"/evenresultsα.csv"), evenresultsα)
 
         αs = FunctionsReadFit.oddα()
         mean_and_stdα = mean_and_std(αs)
         oddresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/oddresultsα.csv", oddresultsα)
+        CSV.write(string(folder,"/oddresultsα.csv"), oddresultsα)
 
         αs = FunctionsReadFit.oscilatoryα()
         mean_and_stdα = mean_and_std(αs)
         oscilatoryresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/oscilatoryresultsα.csv", oscilatoryresultsα)
+        CSV.write(string(folder,"/oscilatoryresultsα.csv"), oscilatoryresultsα)
 
         αs = FunctionsReadFit.pascalα()
         mean_and_stdα = mean_and_std(αs)
         pascalresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/pascalresultsα.csv", pascalresultsα)
+        CSV.write(string(folder,"/pascalresultsα.csv"), pascalresultsα)
 
         αs = FunctionsReadFit.linearα()
         mean_and_stdα = mean_and_std(αs)
         linearresultsα = DataFrame(meanα = [mean_and_stdα[1]], stdα = [mean_and_stdα[2]], dstdα = stdα = [2*mean_and_stdα[2]])
-        CSV.write("DATA/DFA_STATIONARY_FIT/linearresultsα.csv", linearresultsα)
+        CSV.write(string(folder,"/linearresultsα.csv"), linearresultsα)
 
         resultsα  = DataFrame(type = [], meanα = [], stdα = [], dstdα = [])
         types = ["all","random", "prime", "even", "odd", "oscilatory", "pascal", "linear"]
         for tipo in types
-            results = CSV.read("DATA/DFA_STATIONARY_FIT/$(tipo)resultsα.csv", DataFrame)
+            results = CSV.read(string(folder,"/$(tipo)resultsα.csv"), DataFrame)
             push!(resultsα, (tipo, results[1,1], results[1,2], results[1,3]))
         end
-        CSV.write("DATA/DFA_STATIONARY_FIT/resultsα.csv", resultsα)
+        CSV.write(string(folder,"/resultsα.csv"), resultsα)
     end
 
     function β()
+        folder = "DATA/Results_beta"
+        mkpath(folder)
+
         βs = FunctionsReadFit.allβ()
         mean_and_stdβ = mean_and_std(βs)
         allresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/allresultsβ.csv", allresultsβ)
+        CSV.write(string(folder,"/allresultsβ.csv"), allresultsβ)
 
         βs = FunctionsReadFit.randomβ()
         mean_and_stdβ = mean_and_std(βs)
         randomresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/randomresultsβ.csv", randomresultsβ)
+        CSV.write(string(folder,"/randomresultsβ.csv"), randomresultsβ)
 
         βs = FunctionsReadFit.primeβ()
         mean_and_stdβ = mean_and_std(βs)
         primeresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/primeresultsβ.csv", primeresultsβ)
+        CSV.write(string(folder,"/primeresultsβ.csv"), primeresultsβ)
 
         βs = FunctionsReadFit.evenβ()
         mean_and_stdβ = mean_and_std(βs)
         evenresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/evenresultsβ.csv", evenresultsβ)
+        CSV.write(string(folder,"/evenresultsβ.csv"), evenresultsβ)
 
         βs = FunctionsReadFit.oddβ()
         mean_and_stdβ = mean_and_std(βs)
         oddresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/oddresultsβ.csv", oddresultsβ)
+        CSV.write(string(folder,"/oddresultsβ.csv"), oddresultsβ)
 
         βs = FunctionsReadFit.oscilatoryβ()
         mean_and_stdβ = mean_and_std(βs)
         oscilatoryresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/oscilatoryresultsβ.csv", oscilatoryresultsβ)
+        CSV.write(string(folder,"/oscilatoryresultsβ.csv"), oscilatoryresultsβ)
 
         βs = FunctionsReadFit.pascalβ()
         mean_and_stdβ = mean_and_std(βs)
         pascalresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/pascalresultsβ.csv", pascalresultsβ)
+        CSV.write(string(folder,"/pascalresultsβ.csv"), pascalresultsβ)
 
         βs = FunctionsReadFit.linearβ()
         mean_and_stdβ = mean_and_std(βs)
         linearresultsβ = DataFrame(meanβ = [mean_and_stdβ[1]], stdβ = [mean_and_stdβ[2]], dstdβ = [2*mean_and_stdβ[2]])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/linearresultsβ.csv", linearresultsβ)
+        CSV.write(string(folder,"/linearresultsβ.csv"), linearresultsβ)
 
         resultsβ  = DataFrame(type = [], meanβ = [], stdβ = [], dstdβ = [])
         types = ["all","random", "prime", "even", "odd", "oscilatory", "pascal", "linear"]
         for tipo in types
-            results = CSV.read("DATA/POWER_SPECTRA_STATIONARY_FIT/$(tipo)resultsβ.csv", DataFrame)
+            results = CSV.read(string(folder,"/$(tipo)resultsβ.csv"), DataFrame)
             push!(resultsβ, (tipo, results[1,1], results[1,2], results[1,3]))
         end
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/resultsβ.csv", resultsβ)
+        CSV.write(string(folder,"/resultsβ.csv"), resultsβ)
     end
 end
 
@@ -571,23 +343,74 @@ module pvaluesStructured
         return(p)
     end
 
+    function pvalueOscilatoryα()
+        randomαs = FunctionsReadFit.randomα()
+        oscilatoryαs = Float64.(FunctionsReadFit.oscilatoryα())
+        p=pvalue(OneSampleTTest(oscilatoryαs,mean(randomαs)), tail = :both)
+        return(p)
+    end
+
+    function pvalueOscilatoryβ()
+        randomβs = FunctionsReadFit.randomβ()
+        oscilatoryβs = Float64.(FunctionsReadFit.oscilatoryβ())
+        p=pvalue(OneSampleTTest(oscilatoryβs,mean(randomβs)), tail = :both)
+        return(p)
+    end
+
+    function pvaluePascalα()
+        randomαs = FunctionsReadFit.randomα()
+        pascalαs = Float64.(FunctionsReadFit.pascalα())
+        p=pvalue(OneSampleTTest(pascalαs,mean(randomαs)), tail = :both)
+        return(p)
+    end
+
+    function pvaluePascalβ()
+        randomβs = FunctionsReadFit.randomβ()
+        pascalβs = Float64.(FunctionsReadFit.pascalβ())
+        p=pvalue(OneSampleTTest(pascalβs,mean(randomβs)), tail = :both)
+        return(p)
+    end
+
+    function pvalueLinearα()
+        randomαs = FunctionsReadFit.randomα()
+        linearαs = Float64.(FunctionsReadFit.linearα())
+        p=pvalue(OneSampleTTest(linearαs,mean(randomαs)), tail = :both)
+        return(p)
+    end
+
+    function pvalueLinearβ()
+        randomβs = FunctionsReadFit.randomβ()
+        linearβs = Float64.(FunctionsReadFit.linearβ())
+        p=pvalue(OneSampleTTest(linearβs,mean(randomβs)), tail = :both)
+        return(p)
+    end
+    
     function pvaluesAll()
+        folderbeta = "DATA/Results_beta"
+        folderalfa = "DATA/Results_alfa"
+
         pPrimeα = pvaluePrimeα()
         pPrimeβ = pvaluePrimeβ()
         pEvenα = pvalueEvenα()
         pEvenβ = pvalueEvenβ()
         pOddα = pvalueOddα()
         pOddβ = pvalueOddβ()
+        pOscilatoryα = pvalueOscilatoryα()
+        pOscilatoryβ = pvalueOscilatoryβ()
+        pPascalα = pvaluePascalα()
+        pPascalβ = pvaluePascalβ()
+        pLinearα = pvalueLinearα()
+        pLinearβ = pvalueLinearβ()
 
-        pvaluesβ  = DataFrame(Prime = [pPrimeβ], Even = [pEvenβ], Odd = [pOddβ])
-        CSV.write("DATA/POWER_SPECTRA_STATIONARY_FIT/pvaluesβ.csv", pvaluesβ)
-        pvaluesα  = DataFrame(Prime = [pPrimeα], Even = [pEvenα], Odd = [pOddα])
-        CSV.write("DATA/DFA_STATIONARY_FIT/pvaluesα.csv", pvaluesα)
+        pvaluesβ  = DataFrame(Prime = [pPrimeβ], Even = [pEvenβ], Odd = [pOddβ], Oscilatory = [pOscilatoryβ], Pascal = [pPascalβ], Linear = [pLinearβ])
+        CSV.write(string(folderbeta,"/pvaluesβ.csv"), pvaluesβ)
+        pvaluesα  = DataFrame(Prime = [pPrimeα], Even = [pEvenα], Odd = [pOddα], Oscilatory = [pOscilatoryα], Pascal = [pPascalα], Linear = [pLinearα])
+        CSV.write(string(folderalfa,"/pvaluesα.csv"), pvaluesα)
     end
 end
 
 import.Main.ResultsMeanStd
 ResultsMeanStd.α()
 ResultsMeanStd.β()
-# import.Main.pvaluesStructured
-# pvaluesStructured.pvaluesAll()
+import.Main.pvaluesStructured
+pvaluesStructured.pvaluesAll()
