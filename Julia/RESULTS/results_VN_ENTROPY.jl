@@ -219,7 +219,38 @@ module pvaluesStructured
     end
 end
 
+module t_S
+    using StatsBase, DelimitedFiles, DataFrames, CSV
+    
+    function t_S_T()
+        folderR = "DATA/VN_Results"
+        mkpath(folderR)
+        main = "DATA/VON_NEUMANN_ENTROPY"
+        folders = readdir(main)
+        for folder in folders
+            datas = readdir(string(main, "/", folder))
+            tS = []
+            for data in datas
+                S = readdlm(string(main,"/", folder, "/",data))
+                maxS = maximum(S[:,2])
+                t_S = findall(isequal(maxS), S[:,2])
+                t_S = S[t_S[1],1]
+                println(t_S)
+                tS = vcat(tS, t_S)
+            end
+            mean_and_stdtS = mean_and_std(tS)
+            resultstS = DataFrame(meantS = [mean_and_stdtS[1]], stdtS = [mean_and_stdtS[2]], dstdS = [2*mean_and_stdtS[2]])
+            CSV.write(string(folderR,"/$(folder)_results_tS.csv"), resultstS)
+        end
+    end
+end
+
 import.Main.ResultsMeanStd
 ResultsMeanStd.S()
 import.Main.pvaluesStructured
 pvaluesStructured.pvaluesAll()
+
+import.Main.t_S
+t_S.t_S_T()
+
+
