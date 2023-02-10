@@ -54,13 +54,16 @@ This simple command will run all codes, in the following order:
 
 ### Reproducing Figures
 
-To reproduce the Figures, you must be sure that all needed packages listed above are installed, and then, from a Julia terminal opened in the main folder, run:
+To reproduce the Figures, you must be sure that all needed packages listed above are installed, and then, from a Julia terminal opened in figure code folder, run:
 
 `include(fig1.jl)`
 `include(fig2.jl)`
 `include(fig3.jl)`
 `include(fig4.jl)`
 `include(fig5.jl)`
+`include(fig6.jl)`
+`include(fig7.jl)`
+`include(appendix.jl)`
 
 This will create all figures and subfigures in separate .pdf files.
 Make sure to run all codes and generate all data before ploting.
