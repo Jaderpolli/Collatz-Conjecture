@@ -37,43 +37,42 @@ palette = [
     colorant"olivedrab1"
 ]
 
-function PlotOrbit(i, mVectorSize, blocksize, type)
+function PlotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s) 
     println("plotorbit, $(type), $(mVectorSize), $(blocksize)")
     orbit = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_base10.csv", BigFloat, header = false)
     logorbit = log2.(orbit)
-    plt = plot(fontfamily = "Computer Modern", fg_legend = :false)
+    plt = plot(fontfamily = "Palatino", fg_legend = :false)
     plt = plot!(logorbit,
-                size = (415,150),
+                size = (415/s,150/s),
                 lc = :black,
-                xlabel = L"t",
-                ylabel = L"\log_2 [f^t(n_0)]",
+                xlabel = "",
+                ylabel = "",
                 #xrange = (1,5500),
                 #xticks = [1000, 2000, 3000, 4000, 5000],
                 frame = :box,
                 #left_margin = 3mm,
-                bottom_margin = 5mm,
                 legend = :bottomleft,
                 label = false,
                 dpi = 500)
-    savefig(plt, string(pasta,"/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize).pdf"))
+    savefig(plt, string(pasta,"/fig4_$(subfig[sub]).pdf"))
 end
 
-function zoom1plotOrbit(i, mVectorSize, blocksize, type)
+function zoom1plotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s)
     println("zoom_plotorbit, $(type), $(mVectorSize), $(blocksize)")
     orb_prime = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_base10.csv", BigFloat, header = false)
     orb_prime = log2.(orb_prime)
     inset_figure_orb = plot(orb_prime[1:250],
-                    fontfamily = "Computer Modern",
-                    size = (220,150),
+                    fontfamily = "Palatino",
+                    size = (220/s,150/s),
                     lc = :black,
                     frame = :box,
                     label = false,
-                    xlabel = L"t",
-                    #xticks = ([1:25:51;], [400, 425, 450]),
+                    xlabel = "",
+                    xticks = [1:75:250],
                     #yrange = (minimum(orb_prime[1:2000]),maximum(orb_prime)+200),
-                    ylabel = L"\log_2 [f^t(n_0)]"
+                    ylabel = ""
                     )
-    savefig(inset_figure_orb, string(pasta,"/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom1.pdf"))
+    savefig(inset_figure_orb, string(pasta,"/fig4_$(subfig[sub]).pdf"))
 end
 
 function zoom2plotOrbit(i, mVectorSize, blocksize, type)
@@ -81,7 +80,7 @@ function zoom2plotOrbit(i, mVectorSize, blocksize, type)
     orb_prime = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_base10.csv", BigFloat, header = false)
     orb_prime = log2.(orb_prime)
     inset_figure_orb = plot(orb_prime[1:50],
-                    fontfamily = "Computer Modern",
+                    fontfamily = "Palatino",
                     size = (220,150),
                     lc = :black,
                     frame = :box,
@@ -94,7 +93,7 @@ function zoom2plotOrbit(i, mVectorSize, blocksize, type)
     savefig(inset_figure_orb, string(pasta,"/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom2.pdf"))
 end
 
-function plotM(i, mVectorSize, blocksize, type)
+function plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
     println("plotM, $(type), $(mVectorSize), $(blocksize)")
     m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_power_of_2.csv", header = false)
     m = Int64.(replace(m, "" => 0))
@@ -104,18 +103,17 @@ function plotM(i, mVectorSize, blocksize, type)
     lenx = length(m[:,1])
     leny = length(m[1,:])
     plt = heatmap(transpose(m[:,:]),
-                fontfamily = "Computer Modern",
-                xlabel = L"t",
-                ylabel =  L"m_i",
-                bottom_margin = 5mm,
+                fontfamily = "Palatino",
+                xlabel = "",
+                ylabel =  "",
                 #xticks = [2500, 5000, 7500, 10000, 12500],
                 frame = :box,
                 c = cgrad(:cs, categorical = true),
-                size = (450,150), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize).pdf"))
+                size = (450/s,150/s), dpi = 500)
+    savefig(plt, string(pasta,"/fig4_$(subfig[sub]).pdf"))
 end
 
-function zoom1plotM(i, mVectorSize, blocksize, type)
+function zoom1plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
     println("zoomplotM, $(type), $(mVectorSize), $(blocksize)")
     m = readdlm("RAW_DATA/ORBITS/orbit_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_power_of_2.csv", header = false)
     m = Int64.(replace(m, "" => 0))
@@ -130,17 +128,16 @@ function zoom1plotM(i, mVectorSize, blocksize, type)
     pal = palette[1:l]
     loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
     plt = heatmap(transpose(mi),
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 #xticks = ([1:25:51;], [400, 425, 450]),
                 #yticks = ([25:50:225;],["900","950", "1000", "1050", "1100"]),
-                xlabel = L"t",
-                ylabel =  L"m_i",
+                xlabel = "",
+                ylabel =  "",
                 grid = true,
-                right_margin = 2mm,
                 frame = :box,
                 c = cgrad(:cs, categorical = true),
-                size = (250,150), dpi = 500)
-    savefig(plt, string(pasta,"/M_Matrix_n_0_$(i)_$(type)_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize)_zoom1.pdf"))
+                size = (250/s,150/s), dpi = 500)
+    savefig(plt, string(pasta,"/fig4_$(subfig[sub]).pdf"))
 end
 
 function zoom2plotM(i, mVectorSize, blocksize, type)
@@ -158,7 +155,7 @@ function zoom2plotM(i, mVectorSize, blocksize, type)
     pal = palette[1:l]
     loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
     plt = heatmap(transpose(mi),
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 #xticks = ([1:25:51;], [400, 425, 450]),
                 #yticks = ([25:50:225;],["900","950", "1000", "1050", "1100"]),
                 xlabel = L"t",
@@ -189,14 +186,26 @@ end
 #     end
 # end
 
-i = 1
-mVectorSize = 180
-blocksize = 5
-type = "Prime"
+function plotes()
 
-PlotOrbit(i, mVectorSize, blocksize, type)
-zoom1plotOrbit(i, mVectorSize, blocksize, type)
-zoom2plotOrbit(i, mVectorSize, blocksize, type)
-plotM(i, mVectorSize, blocksize, type)
-zoom1plotM(i, mVectorSize, blocksize, type)
-zoom2plotM(i, mVectorSize, blocksize, type)
+    i = 1
+    mVectorSize = 180
+    blocksizes = [2 5]
+    type = "Prime"
+    subfig = ["a", "b", "c", "d", "e", "f", "g", "h"]
+    sub = 0
+    s = 1.44
+    
+    for blocksize in blocksizes
+        sub += 1
+        PlotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s)
+        sub += 1
+        zoom1plotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s)
+        sub += 1
+        plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
+        sub += 1
+        zoom1plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
+    end
+end
+
+plotes()

@@ -19,18 +19,17 @@ function OrbitMrandom()
         orbit_m_sum[i] = sum(m[i,:])
     end
     logorbit = log2.(orbit)
-    plt = plot(fontfamily = "Computer Modern", fg_legend = :false)
+    plt = plot(fontfamily = "Palatino", fg_legend = :false)
     plt = plot!(orbit_m_sum,
-                size = (325,125),
+                size = (260,100),
                 lw = lws[1],
                 lc = RGB(0.2, 0.33, 0.5),
                 xlabel = L"t",
-                ylabel = L"\log_2 [n_t]",
+                ylabel = L"\log_2[n_t]",
                 frame = :box,
-                legend = :topright,
-                label = L"\sum m_i(t)",
+                label = false,
                 dpi = 500)
-    plt = plot!(logorbit, label = L"\log_2 [n_t]", lc = :red, lw = lws[2], linealpha = 0.7)
+    plt = plot!(logorbit, label = false, lc = :red, lw = lws[2], linealpha = 0.7)
     savefig(plt, string(pasta,"/1a.pdf"))
 end
 
@@ -69,13 +68,13 @@ function figMrandom()
     lenx = length(m[:,1])
     leny = length(m[1,:])
     plt = heatmap(transpose(m[:,:]),
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 xlabel = L"t",
                 ylabel =  L"m_i",
                 grid = true,
                 frame = :box,
                 c = cgrad(:cs, categorical = true),
-                size = (325,125), dpi = 500)
+                size = (260,100), dpi = 500)
     savefig(plt, string(pasta,"/1b.pdf"))
 end
 
@@ -87,18 +86,18 @@ function figMrandomzoom1()
     pal = palette[1:l]
     loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
     plt = heatmap(transpose(m[800:1200,1:400]),
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 colorbar_entry = false,
                 xticks = ([1:200:401;],["800", "1000", "1200"]),
                 yticks = ([1:100:401;],["0","100", "200", "300", "400"]),
                 xlabel = L"t",
-                ylabel =  L"m_i",
+                ylabel =  "",
                 grid = true,
                 frame = :box,
                 left_margin = -2mm,
                 bottom_margin = -2mm,
                 c = cgrad(:cs, categorical = true),
-                size =  (160,150), dpi = 500)
+                size =  (160/1.25,150/1.25), dpi = 500)
     savefig(plt, string(pasta,"/1c.pdf"))
 end
 
@@ -110,18 +109,18 @@ function figMrandomzoom2()
     pal = palette[1:l]
     loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
     plt = heatmap(transpose(m[1000:1200,1:200]),
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 xticks = ([1:100:201;],["1000", "1100", "1200"]),
                 yticks = ([1:50:201;],["0","50", "100", "150", "200"]),
                 xlabel = L"t",
                 colorbar_entry = false,
-                ylabel =  L"m_i",
+                ylabel =  "",
                 grid = true,
                 frame = :box,
                 left_margin = -2mm,
                 bottom_margin = -2mm,
                 c = cgrad(:cs, categorical = true),
-                size =  (160,150), dpi = 500)
+                size =  (160/1.25,150/1.25), dpi = 500)
     savefig(plt, string(pasta,"/1d.pdf"))
 end
 
@@ -135,16 +134,16 @@ function figMrandomzoom3()
     plt = heatmap(transpose(m[1100:1200,1:100]),
                 c = cgrad(:cs, categorical = true),
                 colorbar_entry = false,
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 xticks = ([1:50:101;],["1100","1150", "1200"]),
                 yticks = ([1:25:101;],["0","25", "50", "75", "100"]),
                 xlabel = L"t",
-                ylabel =  L"m_i",
+                ylabel =  "",
                 grid = true,
                 frame = :box,
                 left_margin = -2mm,
                 bottom_margin = -2mm,
-                size =  (160,150), dpi = 500)
+                size =  (160/1.25,155/1.25), dpi = 500)
     savefig(plt, string(pasta,"/1e.pdf"))
 end
 
@@ -156,18 +155,18 @@ function figMrandomzoom4()
     pal = palette[1:l]
     loadcolorscheme(:cs, vcat(RGB{Float64}(1,1,1), make_colorscheme(pal, l)[1:end]))
     plt = heatmap(transpose(m[1100:1150,1:50]),
-                fontfamily = "Computer Modern",
+                fontfamily = "Palatino",
                 colorbar_entry = false,
                 xticks = ([1:25:51;],["1100", "1125", "1150"]),
                 yticks = ([1:25:51;],["0","25", "50"]),
                 xlabel = L"t",
-                ylabel =  L"m_i",
+                ylabel =  "",
                 grid = true,
                 frame = :box,
                 left_margin = -2mm,
                 bottom_margin = -2mm,
                 c = cgrad(:cs, categorical = true),
-                size =  (160,150), dpi = 500)
+                size =  (160/1.25,160/1.25), dpi = 500)
     savefig(plt, string(pasta,"/1f.pdf"))
 end
 
