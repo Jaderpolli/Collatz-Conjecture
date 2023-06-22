@@ -63,6 +63,8 @@ To reproduce the Figures, you must be sure that all needed packages listed above
 `include(fig5.jl)`
 `include(fig6.jl)`
 `include(fig7.jl)`
+`include(fig8.jl)`
+`include(fig9.jl)`
 `include(appendix.jl)`
 
 This will create all figures and subfigures in separate .pdf files.
