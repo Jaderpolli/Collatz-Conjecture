@@ -28,6 +28,8 @@ include("DATA_ANALYSIS/CORRELATIONS/autocorrelation_run.jl")
 include("DATA_ANALYSIS/VON_NEUMANN_ENTROPY/von_neumann_entropy_run.jl")
 include("RESULTS/results_PS_DFA.jl")
 include("RESULTS/results_VN_ENTROPY.jl")
+include("DATA_ANALYSIS/CRIPTOGRAPHY_TESTS/pseudo-random-bit-tests.jl")
+include("DATA_ANALYSIS/FSLE/fsle-tests.jl")
 
 # If you intent to reproduce the figures, these packages also must 
 # be installed

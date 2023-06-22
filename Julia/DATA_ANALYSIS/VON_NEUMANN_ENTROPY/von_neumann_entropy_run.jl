@@ -13,7 +13,7 @@ function main()
 
     i = 0
     for type in types
-        mkpath("DATA/POWER_SPECTRA_STATIONARY/VN_$(type)")
+        mkpath("DATA/VON_NEUMANN_ENTROPY/VN_$(type)")
         i += 1
         println("$(type), $(i/length(types))")
         if type == "Linear"
