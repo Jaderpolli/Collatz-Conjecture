@@ -1,358 +1,237 @@
-using Plots
-using DelimitedFiles
-using StatsBase
-using LaTeXStrings
-using Plots.PlotMeasures
-mkpath("FIGURES/fig3")
+module PascalTriangle
+    function pascaltriangle(n)
 
-function plotACFrand(i, blocksize, subfig, sub, s)
-    acf_rand = readdlm("DATA/ACF/ACF_Random/acf_n_0_$(i)_Random_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("rand")
+    row=Any[]
 
-    iid_high_corr_rand = iid_highCorrelations(acf_rand, "rand")
-    writedlm("FIGURES/fig3/iid_high_corr_rand_$(i)_blocksize_$(blocksize).csv", iid_high_corr_rand)
-    bartlett_high_corr_rand = Bartlett_highCorrelations(acf_rand, "rand")
-    writedlm("FIGURES/fig3/bartlett_high_corr_rand_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_rand)
+    #base case
+    if n==1
 
-    iid_high_corr_rand = readdlm("FIGURES/fig3/iid_high_corr_rand_$(i)_blocksize_$(blocksize).csv", header = false)
-    bartlett_high_corr_rand = readdlm("FIGURES/fig3/bartlett_high_corr_rand_$(i)_blocksize_$(blocksize).csv", header = false)
+        return Any[1]
 
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
+    elseif n==2
 
-    figure_rand = plot(abs.(acf_rand),
-                        lc = colors[1],
-                        fontfamily = "Palatino",
-                        xminorticks = true,
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000], xlabel = "", ylabel = "",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = :bottomleft,
-                        label = false)
-    figure_rand = scatter!(iid_high_corr_rand[:,1],iid_high_corr_rand[:,2],
-                        ms = 4,
-                        legend = false,
-                        mc = :red4,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_rand = scatter!(bartlett_high_corr_rand[:,1],bartlett_high_corr_rand[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        legend = false,
-                        mc = :red4,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_rand = plot!(size = (300/s,200/s), dpi = 500, grid = true)
-    savefig(figure_rand, "FIGURES/fig3/fig_3$(subfig[sub]).pdf")
-end
+        return Any[1,1]
 
-function plotACFprime(i, blocksize, subfig, sub, s)
+    else
 
-    acf_prime = readdlm("DATA/ACF/ACF_Prime/acf_n_0_$(i)_Prime_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("prime")
+        #calculate the elements in each row
+        for i in 2:n-1
 
-    iid_high_corr_prime = iid_highCorrelations(acf_prime, "prime")
-     writedlm("FIGURES/fig3/iid_high_corr_prime_$(i)_blocksize_$(blocksize).csv", iid_high_corr_prime)
-     bartlett_high_corr_prime = Bartlett_highCorrelations(acf_prime, "prime")
-     writedlm("FIGURES/fig3/bartlett_high_corr_prime_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_prime)
+            #rolling sum all the values within 2 windows from the previous row
+            #but we cannot include two boundary numbers 1 in this row
+            push!(row,pascaltriangle(n-1)[i-1]+pascaltriangle(n-1)[i])
 
-    #iid_high_corr_prime = readdlm("FIGURES/fig3/iid_high_corr_prime_$(i)_blocksize_$(blocksize).csv", header = false)
-    #bartlett_high_corr_prime = readdlm("FIGURES/fig3/bartlett_high_corr_prime_$(i)_blocksize_$(blocksize).csv", header = false)
-
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    figure_prime = plot(abs.(acf_prime),
-                        lc = colors[2],
-                        fontfamily = "Palatino",
-                        xminorticks = true,
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000], xlabel = "", ylabel = "",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = false)
-    figure_prime = scatter!(iid_high_corr_prime[:,1],iid_high_corr_prime[:,2],
-                        ms = 4,
-                        legend = false,
-                        mc = :orangered,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_prime = scatter!(bartlett_high_corr_prime[:,1],bartlett_high_corr_prime[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        legend = false,
-                        mc = :orangered,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_prime = plot!(size = (300/s,200/s), dpi = 500, grid = true)
-    savefig(figure_prime, "FIGURES/fig3/fig_3$(subfig[sub]).pdf")
-end
-
-function plotACFeven(i, blocksize, subfig, sub, s)
-
-    acf_even = readdlm("DATA/ACF/ACF_Even/acf_n_0_$(i)_Even_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("even")
-   
-     iid_high_corr_even = iid_highCorrelations(acf_even, "even")
-     writedlm("FIGURES/fig3/iid_high_corr_even_$(i)_blocksize_$(blocksize).csv", iid_high_corr_even)
-     bartlett_high_corr_even = Bartlett_highCorrelations(acf_even, "even")
-     writedlm("FIGURES/fig3/bartlett_high_corr_even_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_even)
-
-    # iid_high_corr_even = readdlm("FIGURES/fig3/iid_high_corr_even_$(i)_blocksize_$(blocksize).csv", header = false)
-    # bartlett_high_corr_even = readdlm("FIGURES/fig3/bartlett_high_corr_even_$(i)_blocksize_$(blocksize).csv", header = false)
-
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    figure_even = plot(abs.(acf_even),
-                        lc = colors[3],
-                        xminorticks = true,
-                        fontfamily = "Palatino",
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000], xlabel = "", ylabel = "",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = false)
-    figure_even = scatter!(iid_high_corr_even[:,1],iid_high_corr_even[:,2],
-                        ms = 4,
-                        legend = false,
-                        mc = :darkgreen,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_even = scatter!(bartlett_high_corr_even[:,1],bartlett_high_corr_even[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        legend = false,
-                        mc = :darkgreen,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_even = plot!(size = (300/s,200/s), dpi = 500, grid = true)
-    savefig(figure_even, "FIGURES/fig3/3$(subfig[sub]).pdf")
-end
-
-function plotACFodd(i, blocksize)
-
-    acf_odd = readdlm("DATA/ACF/ACF_Odd/acf_n_0_$(i)_Odd_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("odd")
-    
-    #iid_high_corr_odd = iid_highCorrelations(acf_odd, "odd")
-    #writedlm("FIGURES/fig3/iid_high_corr_odd_$(i)_blocksize_$(blocksize).csv", iid_high_corr_odd)
-    #bartlett_high_corr_odd = Bartlett_highCorrelations(acf_odd, "odd")
-    #writedlm("FIGURES/fig3/bartlett_high_corr_odd_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_odd)
-
-    iid_high_corr_odd = readdlm("FIGURES/fig3/iid_high_corr_odd_$(i)_blocksize_$(blocksize).csv", header = false)
-    bartlett_high_corr_odd = readdlm("FIGURES/fig3/bartlett_high_corr_odd_$(i)_blocksize_$(blocksize).csv", header = false)
-
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    figure_odd = plot(abs.(acf_odd),
-                        lc = colors[4],
-                        xminorticks = true,
-                        fontfamily = "Palatino",
-                        left_margin = 5mm,
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000], xlabel = L"\tau", ylabel = L"C( \tau)",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = :bottomleft,
-                        label = L"C( \tau)")
-    figure_odd = scatter!(iid_high_corr_odd[:,1],iid_high_corr_odd[:,2],
-                        ms = 4,
-                        label = L"C(\tau) > 3/\sqrt{N}",
-                        mc = :darkblue,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_odd = scatter!(bartlett_high_corr_odd[:,1],bartlett_high_corr_odd[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        label = L"C(\tau) > 3\sigma_{C(\tau)}",
-                        mc = :darkblue,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_odd = plot!(size = (300,200), dpi = 500, grid = true)
-    savefig(figure_odd, "FIGURES/fig3/acf_odd_$(i)_blocksize_$(blocksize).pdf")
-end
-
-function plotACFoscilatory(i, blocksize)
-
-    acf_oscilatory = readdlm("DATA/ACF/ACF_Oscilatory/acf_n_0_$(i)_Oscilatory_mVectorSize_2100_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("oscilatory")
-    
-    iid_high_corr_oscilatory = iid_highCorrelations(acf_oscilatory, "oscilatory")
-   writedlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).csv", iid_high_corr_oscilatory)
-    bartlett_high_corr_oscilatory = Bartlett_highCorrelations(acf_oscilatory, "oscilatory")
-    writedlm("FIGURES/fig3/bartlett_high_corr_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).csv", bartlett_high_corr_oscilatory)
-
-#    iid_high_corr_oscilatory = readdlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).csv", header = false)
-#    bartlett_high_corr_oscilatory = readdlm("FIGURES/fig3/bartlett_high_corr_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).csv", header = false)
-
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    figure_oscilatory = plot(abs.(acf_oscilatory),
-                        lc = colors[5],
-                        xminorticks = true,
-                        fontfamily = "Computer Modern",
-                        left_margin = 5mm,
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000, 10000], xlabel = L"\tau", ylabel = L"C( \tau)",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = :bottomleft,
-                        label = L"C( \tau)")
-    figure_oscilatory = scatter!(iid_high_corr_oscilatory[:,1],iid_high_corr_oscilatory[:,2],
-                        ms = 4,
-                        label = L"C(\tau) > 3/\sqrt{N}",
-                        mc = :purple4,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_oscilatory = scatter!(bartlett_high_corr_oscilatory[:,1],bartlett_high_corr_oscilatory[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        label = L"C(\tau) > 3\sigma_{C(\tau)}",
-                        mc = :purple4,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_oscilatory = plot!(size = (300,200), dpi = 500, grid = true)
-    savefig(figure_oscilatory, "FIGURES/fig3/antigas/acf_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).pdf")
-end
-
-function plotACFpascal(i, blocksize)
-
-    acf_pascal = readdlm("DATA/ACF/ACF_Pascal/acf_n_0_$(i)_Pascal_mVectorSize_180_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("pascal")
-    
-    iid_high_corr_pascal = iid_highCorrelations(acf_pascal, "pascal")
-    writedlm("FIGURES/fig3/iid_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", iid_high_corr_pascal)
-    bartlett_high_corr_pascal = Bartlett_highCorrelations(acf_pascal, "pascal")
-    writedlm("FIGURES/fig3/bartlett_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", bartlett_high_corr_pascal)
-
-    # iid_high_corr_pascal = readdlm("FIGURES/fig3/iid_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", header = false)
-    # bartlett_high_corr_pascal = readdlm("FIGURES/fig3/bartlett_high_corr_pascal_$(i)_blocksize_$(blocksize).csv", header = false)
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    figure_pascal = plot(abs.(acf_pascal),
-                        lc = colors[6],
-                        xminorticks = true,
-                        fontfamily = "Palatino",
-                        left_margin = 5mm,
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000], xlabel = L"\tau", ylabel = L"C( \tau)",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = :bottomleft,
-                        label = L"C( \tau)")
-    figure_pascal = scatter!(iid_high_corr_pascal[:,1],iid_high_corr_pascal[:,2],
-                        ms = 4,
-                        label = L"C(\tau) > 3/\sqrt{N}",
-                        mc = :magenta3,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_pascal = scatter!(bartlett_high_corr_pascal[:,1],bartlett_high_corr_pascal[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        label = L"C(\tau) > 3\sigma_{C(\tau)}",
-                        mc = :magenta3,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_pascal = plot!(size = (300,200), dpi = 500, grid = true)
-    savefig(figure_pascal, "FIGURES/fig3/acf_pascal_$(i)_blocksize_$(blocksize).pdf")
-end
-
-function Bartlett_highCorrelations(x, type)
-    high_corr = reshape([],0,2)
-    N = length(x)
-    σs = reshape([], 0,2)
-    for τ in 1:N
-        println("$(100*τ/N) %", "$(type)")
-        S = 0
-        for ν in 1:N
-            if ν-τ ≤ 0
-                ds = x[ν]^2+2*x[ν]^2*x[τ]
-            elseif ν+τ ≥ N
-                ds = x[ν]^2-4*x[τ]x[ν]x[ν-τ]+x[ν]^2*x[τ]^2
-            else
-                ds = x[ν]^2+x[ν+τ]*x[ν-τ]-4*x[τ]x[ν]x[ν-τ]+x[ν]^2*x[τ]^2
-            end
-            S = S+ds
         end
-        σ = sqrt(S/N)
-        if abs(x[τ]) > 3*σ
-            hc = [τ abs(x[τ])]
-            high_corr = vcat(high_corr, hc)
-        else
-            nothing
-        end
-        τσ = [τ σ]
-        σs = vcat(σs, τσ)
+
+        #append 1 for both front and rear of the row
+        pushfirst!(row,1)
+        push!(row,1)
+
     end
-    writedlm("FIGURES/fig3/σ_$(type).csv", σs)
-    return(high_corr)
-end
 
-function iid_highCorrelations(x, type)
-    high_corr = reshape([],0,2)
-    N = length(x)
-    for τ in 1:N
-        if abs(x[τ]) > 3/sqrt(N)
-            hc = [τ abs(x[τ])]
-            high_corr = vcat(high_corr, hc)
-        else
-            nothing
-        end
-    end
-    return(high_corr)
-end
+    return row
 
-
-function plote()
-    s = 1.9
-    blocksizes = [2 3 5]
-    subfig = ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
-    i = 1
-
-    sub = 0
-
-    for blocksize in blocksizes
-        sub += 1
-        plotACFrand(i, blocksize, subfig, sub,s)
-        sub += 1
-        plotACFprime(i, blocksize, subfig, sub, s)
-        sub += 1
-        plotACFeven(i, blocksize, subfig, sub, s)
     end
 end
 
-plote()
+using Plots, Plots.PlotMeasures, DelimitedFiles, ColorSchemes, LaTeXStrings, Colors, ColorSchemeTools
+using CSV, StatsPlots, DataFrames, Combinatorics
+pasta = "FIGURES/fig3"
+mkpath(pasta)
+import Main.PascalTriangle
+
+function ps_boxplots(s)
+    types = ["Random", "Prime", "Odd", "Even", "Oscilatory", "Pascal", "Linear"]
+
+    a = plot(size = (420/s,250/s), fontfamily = "Palatino", frame = :box,
+        xlabel = "",
+        yguidefontrotation = -90, 
+        ylabel =  "", dpi = 500)
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
+    j = 0
+    
+    for type in types
+        j = j+1
+        folder = "DATA/POWER_SPECTRA_STATIONARY_FIT/PS_FIT_$(type)"
+        files = readdir(folder)
+        power_law = []
+        PL = zeros(1, length(files))
+        for file in files
+            fit = readdlm(string(folder,"/",file))
+            power_law = vcat(power_law, fit[2])
+        end
+        PL[1,:] = power_law
+        data = DataFrame(transpose(PL), [type])
+        a = @df data dotplot!([type], data[!,1], marker = (colors[j], stroke(0)), label = false)
+        a = @df data boxplot!([type], data[!,1], fillalpha  = 0.7, c = colors[j], label = false, linewidth = 2)
+    end
+
+    savefig(a, string(pasta,"/2c.pdf"))
+end
+
+function DFA_boxplots(s)
+
+    types = ["Random", "Prime", "Odd", "Even", "Oscilatory", "Pascal", "Linear"]
+
+    a = plot(size = (420/s,250/s), fontfamily = "Palatino", frame = :box,
+        xlabel = "", legend = :topleft, yrange = [0.36,0.9], fg_legend = false,
+        yguidefontrotation = -90,
+        ylabel =  "", dpi = 500)
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
+    j = 0
+    
+    for type in types
+        j = j+1
+        folder = "DATA/DFA_STATIONARY_FIT/DFA_FIT_$(type)"
+        files = readdir(folder)
+        power_law = []
+        PL = zeros(1, length(files))
+        for file in files
+            fit = readdlm(string(folder,"/",file))
+            power_law = vcat(power_law, fit[2])
+        end
+        PL[1,:] = power_law
+        data = DataFrame(transpose(PL), [type])
+        a = @df data dotplot!([type], data[!,1], marker = (colors[j], stroke(0)), label = false)
+        a = @df data boxplot!([type], data[!,1], fillalpha  = 0.7, c = colors[j], label = false, linewidth = 2, legend_position = (0.1,.925))
+    end
+    plot!(;legend_column = 2)
+    
+    savefig(a, string(pasta,"/2d.pdf"))
+end
+
+function plot_ps(s)
+    randpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Random/powerspectra_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_2.csv", header=false)
+    primepowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Prime/powerspectra_n_0_3_Prime_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
+    evenpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Even/powerspectra_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    oddpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Odd/powerspectra_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    oscilatorypowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Oscilatory/powerspectra_n_0_2_Oscilatory_mVectorSize_2000_MaxRand_10_BlockSize_2.csv", header=false)
+    pascalpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Pascal/powerspectra_n_0_1_Pascal Triangle_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header=false)
+    linearpowerspectra = readdlm("DATA/POWER_SPECTRA_STATIONARY/PS_Linear/powerspectra_n_0_2_Linear_mVectorSize_1000_MaxRand_10_BlockSize_3.csv", header=false)
+
+    figure = plot(
+                yscale = :log10,
+                xscale = :log10,
+                fontfamily = "Palatino",
+                xlabel = "",
+                ylabel = "",
+                yguidefontrotation = -90,
+                framestyle = :box,
+                legend = :bottomleft,
+                fg_legend = false
+    )
+    figure = plot!(
+            #xticks = [1, 10, 100, 1000],
+            yticks = [0.001, 0.1, 10, 1000 , 100000],
+            #minorgrid = true#=,
+            minorticks = true
+    )
+
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
+
+    figure = plot!(randpowerspectra[:,1],randpowerspectra[:,2],  lc = colors[1], label = false)
+    figure = plot!(primepowerspectra[:,1], primepowerspectra[:,2], linealpha = 0.8, lc = colors[2], label = false)
+    figure = plot!(evenpowerspectra[:,1], evenpowerspectra[:,2], linealpha = 0.7, lc = colors[3], label = false)
+    figure = plot!(oddpowerspectra[:,1], oddpowerspectra[:,2], linealpha = 0.6, lc = colors[4], label = false)
+    figure = plot!(oscilatorypowerspectra[:,1], oscilatorypowerspectra[:,2], linealpha = 0.5, lc = colors[5], label = false)
+    figure = plot!(pascalpowerspectra[:,1], pascalpowerspectra[:,2], linealpha = 0.5, lc = colors[6], label = false)
+    figure = plot!(linearpowerspectra[:,1], linearpowerspectra[:,2], linealpha = 0.3, lc = colors[7], label = false)
+    figure = plot!(size = (420/s, 250/s), dpi = 500)
+    figure = plot!(pascalpowerspectra[:,1], 0.3*pascalpowerspectra[:,1].^(0), ls = :dash, lc = :black, label = L"\, \, \, \, P = 0.3")
+    savefig(figure, string(pasta, "/2a.pdf"))
+end
+
+function plot_dfa(s)
+    randdfa = readdlm("DATA/DFA_STATIONARY/DFA_Random/dfa_stationary_n_0_1_Random_mVectorSize_180_MaxRand_10_BlockSize_2.csv", header=false)
+    primedfa = readdlm("DATA/DFA_STATIONARY/DFA_Prime/dfa_stationary_n_0_3_Prime_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
+    evendfa = readdlm("DATA/DFA_STATIONARY/DFA_Even/dfa_stationary_n_0_1_Even_mVectorSize_180_MaxRand_10_BlockSize_4.csv", header=false)
+    odddfa = readdlm("DATA/DFA_STATIONARY/DFA_Odd/dfa_stationary_n_0_1_Odd_mVectorSize_180_MaxRand_10_BlockSize_3.csv", header=false)
+    oscilatorydfa = readdlm("DATA/DFA_STATIONARY/DFA_Oscilatory/dfa_stationary_n_0_2_Oscilatory_mVectorSize_1200_MaxRand_10_BlockSize_6.csv", header=false)
+    pascaldfa = readdlm("DATA/DFA_STATIONARY/DFA_Pascal/dfa_stationary_n_0_8_Pascal Triangle_mVectorSize_180_MaxRand_10_BlockSize_6.csv", header=false)
+    lineardfa = readdlm("DATA/DFA_STATIONARY/DFA_Linear/dfa_stationary_n_0_1_Linear_mVectorSize_1000_MaxRand_10_BlockSize_3.csv", header=false)
+
+    figure = plot(
+                yscale = :log10,
+                xscale = :log10,
+                fontfamily = "Palatino",
+                xlabel = "",
+                ylabel = "",
+                yguidefontrotation = -90,
+                framestyle = :box,
+                legend = :bottomright,
+                fg_legend = :false
+    )
+    figure = plot!( xticks = [1, 10, 100, 1000],
+            yticks = [0.1, 1, 10],
+            #minorgrid = true#=,
+            minorticks = true
+    )
+
+    colors = [:red, :orange3, :yellow, :green, :blue, :purple4, :magenta]
+
+    figure = plot!(randdfa[:,1],randdfa[:,2], lc = colors[1],  ms = 2, marker = (colors[1], stroke(0)),  markeralpha = 1, label = false)
+    figure = plot!(primedfa[:,1], primedfa[:,2], linealpha = 0.8, lc = colors[2],  ms = 1.5, marker = (colors[2], stroke(0)),  markeralpha = 0.8, label = false)
+    figure = plot!(evendfa[:,1], evendfa[:,2], linealpha = 0.7, lc = colors[3],  ms = 1.5, marker = (colors[3], stroke(0)),  markeralpha = 0.7, label = false)
+    figure = plot!(odddfa[:,1], odddfa[:,2], linealpha = 0.6, lc = colors[4],  ms = 1.5, marker = (colors[4], stroke(0)),  markeralpha = 0.6, label = false)
+    figure = plot!(oscilatorydfa[:,1], oscilatorydfa[:,2], linealpha = 0.5, lc = colors[5],  ms = 1.5, marker = (colors[5], stroke(0)), markeralpha = 0.5, label = false)
+    figure = plot!(pascaldfa[:,1], pascaldfa[:,2], linealpha = 0.4, lc = colors[6],  ms = 1.5, marker = (colors[6], stroke(0)),  markeralpha = 0.4,label = false)
+    figure = plot!(lineardfa[:,1], lineardfa[:,2], linealpha = 0.4, lc = colors[7],  ms = 1.5, marker = (colors[7], stroke(0)),  markeralpha = 0.4,label = false)
+    figure = plot!(size = (420/s, 250/s), dpi = 500)
+    figure = plot!(oscilatorydfa[:,1], 0.2*oscilatorydfa[:,1].^(1/2), ls = :dash, lc = :black, label = L"\, \, \, \ell^{1/2}")
+
+    BB = bbox(0.1,0.05, .45, 0.3)
+
+    pascaldfa = readdlm("DATA/DFA_STATIONARY/DFA_Pascal/dfa_stationary_n_0_1_Pascal Triangle_mVectorSize_2100_MaxRand_10_BlockSize_2.csv", header=false)
+    figure = plot!(pascaldfa[:,1], pascaldfa[:,2], 
+                    yscale = :log10, xscale = :log10,
+                    #xlabel = L"\ell",
+                    #ylabel = L"F(\ell)",
+                    yguidefontrotation = -90,
+                    framestyle = :box,
+                    linealpha = 0.4, lc = colors[6],  ms = 1.5, marker = (colors[6], stroke(0)),  markeralpha = 0.4,label = false,
+                    inset = (1,BB), subplot = 2)
+    figure = plot!(pascaldfa[:,1], 0.2 .*pascaldfa[:,1].^(1/2),  linewidt = 1,
+                    fg_legend = :false,
+                    legend = :topleft,
+                    ls = :dash, lc = :black, label = false, subplot = 2)
+    #figure = plot!(size = (220, 100), dpi = 500, left_margin = 3.75mm, bottom_margin = 0.5mm, top_margin = -1.7mm, right_margin=-1mm,
+                   # inset = bbox(0.05, 0.05, 0.5, 0.25, :bottom, :right))
+    #figure = plot!(pascaldfa[:,1], 0.2*pascaldfa[:,1].^(1/2), 
+                    #inset = (1, bbox(0.05, 0.05, 0.5, 0.25, :bottom, :right)))
+    
+    savefig(figure, string(pasta, "/2b.pdf"))
+end
+
+function inset_dfa()
+    
+
+    figure = plot(
+                 yscale = :log10,
+                 xscale = :log10,
+                 fontfamily = "Palatino",
+                 xlabel = L"\ell",
+                 ylabel = L"F(\ell)",
+                 yguidefontrotation = -90,
+                 framestyle = :box,
+                 legend = :topleft,
+                fg_legend = :false
+     )
+    figure = plot!( xticks = [1, 10, 100, 1000],
+             yticks = [0.1, 1, 10],
+             #minorgrid = true#=,
+             minorticks = true
+     )
+
+     colors = [:purple4]
+
+    
+     savefig(figure, string(pasta, "/1d_inset.pdf"))
+ end
+
+s = 1.7 # scale
+
+ps_boxplots(s)
+DFA_boxplots(s)
+plot_ps(s)
+plot_dfa(s)
+inset_dfa()

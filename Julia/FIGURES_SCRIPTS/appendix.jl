@@ -64,16 +64,17 @@ function plote()
         nhist = normalize(hist, mode = :pdf)
         x = range(minimum(Rfu), maximum(Rfu), length = length(nhist.weights))
         fithist = fit_mle(Laplace, Rfu)
+        fithist2 = Laplace(fithist.μ, 0.0272)
         hst = plot(x, nhist.weights, fontfamily = "Palatino", 
                         xlabel = "", ylabel = "", legend = :topright, fg_legend = false,
                         label = "$(type)", lw = 2,
                         lc = colors1[j], frame = :box, size = (200, 200)
                         )
-        hst = plot!(x, fithist, lw = 2, ls = :dash, lc = :grey31, label = "Laplace pdf")
+        hst = plot!(x, fithist2, lw = 2, ls = :dot, lc = :grey31, label = "Laplace pdf")
     end
     savefig(hst, string(pasta2,"/","hist_types1.pdf"))
 
-    hst = plot()
+ #=    hst = plot()
     j = 0
     for type in types2
         j += 1
@@ -89,7 +90,7 @@ function plote()
                         )
         #hst = plot!(x, fithist, lw = 1, ls = :dash, lc = :grey31, label = "Laplace pdf")
     end
-    savefig(hst, string(pasta2,"/","hist_types2.pdf"))
+    savefig(hst, string(pasta2,"/","hist_types2.pdf")) =#
     
     # hst = plot()
     # j = 0
@@ -108,5 +109,5 @@ function plote()
 
 end
 
-R()
+#Rm()
 plote()

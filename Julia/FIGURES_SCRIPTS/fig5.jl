@@ -4,7 +4,7 @@ using StatsBase
 using LaTeXStrings, ColorSchemes,  Colors, ColorSchemeTools
 using Plots.PlotMeasures
 
-pasta = "FIGURES/fig5"
+pasta = "FIGURES/fig4"
 mkpath(pasta)
 
 palette = [
@@ -68,7 +68,7 @@ function zoom1plotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s)
                     frame = :box,
                     label = false,
                     xlabel = "",
-                    #xticks = ([1:25:51;], [400, 425, 450]),
+                    xticks = [1:75:250],
                     #yrange = (minimum(orb_prime[1:2000]),maximum(orb_prime)+200),
                     ylabel = ""
                     )
@@ -110,7 +110,7 @@ function plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
                 frame = :box,
                 c = cgrad(:cs, categorical = true),
                 size = (450/s,150/s), dpi = 500)
-    savefig(plt, string(pasta,"/fig5_$(subfig[sub]).pdf"))
+    savefig(plt, string(pasta,"/fig4_$(subfig[sub]).pdf"))
 end
 
 function zoom1plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
@@ -137,7 +137,7 @@ function zoom1plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
                 frame = :box,
                 c = cgrad(:cs, categorical = true),
                 size = (250/s,150/s), dpi = 500)
-    savefig(plt, string(pasta,"/fig5_$(subfig[sub]).pdf"))
+    savefig(plt, string(pasta,"/fig4_$(subfig[sub]).pdf"))
 end
 
 function zoom2plotM(i, mVectorSize, blocksize, type)
@@ -186,70 +186,26 @@ end
 #     end
 # end
 
-function plotACFoscilatory(i, mVectorSize, blocksize, subfig, sub, s)
-
-    
-    acf_oscilatory = readdlm("DATA/ACF/ACF_Oscilatory/acf_n_0_$(i)_Oscilatory_mVectorSize_$(mVectorSize)_MaxRand_10_BlockSize_$(blocksize).csv", BigFloat, header = false)
-    println("oscilatory")
-
-    iid_high_corr_oscilatory = iid_highCorrelations(acf_oscilatory, "oscilatory")
-   writedlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).csv", iid_high_corr_oscilatory)
-    bartlett_high_corr_oscilatory = Bartlett_highCorrelations(acf_oscilatory, "oscilatory")
-    writedlm("FIGURES/fig3/bartlett_high_corr_oscilatory_$(i)_mVectorSize_2100_blocksize_$(blocksize).csv", bartlett_high_corr_oscilatory)
-
-#    iid_high_corr_oscilatory = readdlm("FIGURES/fig3/iid_high_corr_oscilatory_$(i)_mVectorSize_$(mVectorSize)_blocksize_$(blocksize).csv", header = false)
-#    bartlett_high_corr_oscilatory = readdlm("FIGURES/fig3/bartlett_high_corr_oscilatory_$(i)_mVectorSize_$(mVectorSize)_blocksize_$(blocksize).csv", header = false)
-
-
-    colors = [:red, :orange, :green, :blue, :purple, :magenta]
-
-    figure_oscilatory = plot(abs.(acf_oscilatory),
-                        lc = colors[5],
-                        xminorticks = true,
-                        fontfamily = "Palatino",
-                       # left_margin = 5mm,
-                        yticks = [0.0000001,0.000001,0.00001, 0.0001,0.001,0.01,0.1,1],
-                        xticks = [1, 10, 100, 1000, 10000], xlabel = "", ylabel = "",
-                        yguidefontrotation = -90,
-                        yscale = :log10,
-                        xscale = :log10,
-                        legend = :bottomleft,
-                        label = false)
-    figure_oscilatory = scatter!(iid_high_corr_oscilatory[:,1],iid_high_corr_oscilatory[:,2],
-                        ms = 4,
-                        label = false,
-                        mc = :purple4,
-                        markerstrokewidth = 0,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_oscilatory = scatter!(bartlett_high_corr_oscilatory[:,1],bartlett_high_corr_oscilatory[:,2],
-                        ms = 4,
-                        marker = [:star],
-                        markerstrokewidth = 3,
-                        label = false,
-                        mc = :purple4,
-                        frame = :box,
-                        yscale = :log10,
-                        xscale = :log10)
-    figure_oscilatory = plot!(size = (250/s,150/s), dpi = 500, grid = true)
-    savefig(figure_oscilatory, "FIGURES/fig5/fig5_$(subfig[sub])_2.pdf")
-end
-
 function plotes()
 
     i = 1
-    mVectorSize = 2100
-    blocksize = 2
-    type = "Oscilatory"
-    subfig = ["a", "b"]
+    mVectorSize = 180
+    blocksizes = [2 5]
+    type = "Prime"
+    subfig = ["a", "b", "c", "d", "e", "f", "g", "h"]
     sub = 0
     s = 1.44
     
-    sub += 1
-    plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
-    sub += 1
-    plotACFoscilatory(i, mVectorSize, blocksize, subfig, sub, s)
+    for blocksize in blocksizes
+        sub += 1
+        PlotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s)
+        sub += 1
+        zoom1plotOrbit(i, mVectorSize, blocksize, type, subfig, sub, s)
+        sub += 1
+        plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
+        sub += 1
+        zoom1plotM(i, mVectorSize, blocksize, type, subfig, sub, s)
+    end
 end
 
 plotes()
