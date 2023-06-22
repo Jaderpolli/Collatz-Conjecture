@@ -1,8 +1,8 @@
 # Stochastic-like characteristics in Collatz Map
 
-In this repository, all codes necessary to study the presence of stochastic behavior into the hailstone sequences of the Collatz Map are provided.
+In this repository, all codes necessary to study the presence of stochastic behavior in the hailstone sequences of the Collatz Map are provided.
 These codes were used to obtain the results of the paper "Stochastic-like characteristics of arithmetic dynamical
-systems: the Collatz hailstone sequences" with contributin authors Jaderson G. Polli, E. P. Raposo, G. M. Viswanathan and M. G. E. da Luz.
+systems: the Collatz hailstone sequences" with contributing authors Jaderson G. Polli, E. P. Raposo, G. M. Viswanathan and M. G. E. da Luz.
 
 ## Description
 
@@ -12,7 +12,7 @@ In the next section, the details on how to install and run the codes to obtain t
 ## Instalation and Run Guide
 
 All codes are written in Julia Language, then, after cloning this repository and before running the codes, one needs to
-properly install the [Current Stable release of Julia](https://julialang.org/downloads/) and the packages listed bellow.
+properly install the [Current Stable release of Julia](https://julialang.org/downloads/) and the packages listed below.
 In the process of obtaining the results of the paper, Julia 1.7.2 was used.
 
 The following packages are necessary to properly reproduce all results:
@@ -37,9 +37,9 @@ Additionally, if one wishes to reproduce the figures, the following packages are
 - `ColorSchemeTools`
 - `LaTeXStrings`
 
-The instalation of the packages, and verifying possible updates, is done together with the running of all codes in the file `run_all.jl` inside the `Julia` folder.
+The installation of the packages, and verifying possible updates, are done together with the running of all codes in the file `run_all.jl` inside the `Julia` folder.
 
-Then, in order to install the necessary packages and run all codes, simple open the Julia terminal on the main directory and run
+Then, to install the necessary packages and run all codes, simply open the Julia terminal on the main directory and run
 
 `include("Julia/run_all.jl")`
 
@@ -54,7 +54,7 @@ This simple command will run all codes, in the following order:
 
 ### Reproducing Figures
 
-To reproduce the Figures, you must be sure that all needed packages listed above are installed, and then, from a Julia terminal opened in figure code folder, run:
+To reproduce the Figures, you must be sure that all needed packages listed above are installed, and then, from a Julia terminal opened in the figure code folder, run:
 
 `include(fig1.jl)`
 `include(fig2.jl)`
@@ -68,4 +68,4 @@ To reproduce the Figures, you must be sure that all needed packages listed above
 `include(appendix.jl)`
 
 This will create all figures and subfigures in separate .pdf files.
-Make sure to run all codes and generate all data before ploting.
+Make sure to run all codes and generate all data before plotting.
