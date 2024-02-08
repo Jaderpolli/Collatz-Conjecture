@@ -1,8 +1,9 @@
 # Stochastic-like characteristics in Collatz Map
 
 In this repository, all codes necessary to study the presence of stochastic behavior in the hailstone sequences of the Collatz Map are provided.
-These codes were used to obtain the results of the paper "Stochastic-like characteristics of arithmetic dynamical
-systems: the Collatz hailstone sequences" with contributing authors Jaderson G. Polli, E. P. Raposo, G. M. Viswanathan and M. G. E. da Luz.
+These codes were used to obtain the results of the paper [Stochastic-like characteristics of arithmetic dynamical
+systems: the Collatz hailstone sequences](https://doi.org/10.1088/2632-072X/ad271f) accepted for publication at [Journal of Physics: Complexity](https://iopscience.iop.org/journal/2632-072X) 
+with contributing authors Jaderson G. Polli, E. P. Raposo, G. M. Viswanathan and M. G. E. da Luz.
 
 ## Description
 
